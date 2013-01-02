@@ -1,0 +1,96 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2009-2013 Sebastien Helleu <flashcode@flashtux.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#
+# Perform some checks on gettext files:
+# - check compilation (msgfmt -c)
+# - for each translation which is not fuzzy/empty:
+#    - check number of lines in translated string
+#    - check spaces at beginning/end of string
+#
+# Syntax:
+#    msgcheck.py file.po [file.po ...]
+#
+# 2013-01-02, Sebastien Helleu <flashcode@flashtux.org>:
+#     version 0.5: replace os.system by subprocess, display syntax when script
+#                  is called without filename, rename script to "msgcheck.py"
+# 2012-09-21, Sebastien Helleu <flashcode@flashtux.org>:
+#     version 0.4: add check of compilation with "msgfmt -c"
+# 2011-04-14, Sebastien Helleu <flashcode@flashtux.org>:
+#     version 0.3: allow multiple po filenames
+# 2011-04-10, Sebastien Helleu <flashcode@flashtux.org>:
+#     version 0.2: add check of spaces at beginning/end of strings
+# 2010-03-22, Sebastien Helleu <flashcode@flashtux.org>:
+#     version 0.1: initial release
+#
+
+import os, sys, subprocess
+
+def error(msg_error, msg_in):
+    """Display an error found in gettext file."""
+    print('%s\nERROR: %s:\n\n%s\n' % ('='*60, msg_error, msg_in))
+
+if len(sys.argv) >= 2:
+    # if user gives .po filename, then run checks on file:
+    # 1. check compilation (msgfmt -c)
+    # 2. remove untranslated/fuzzy strings, and call msgexec, with this script
+    #    as argument: this script will be called for each string in file
+    for filename in sys.argv[1:]:
+        # check compilation
+        print('Checking compilation of %s...' % filename)
+        subprocess.call(['msgfmt', '-c', '-o', '/dev/null', filename])
+        # check each translation in file
+        print('Checking lines in %s...' % filename)
+        p1 = subprocess.Popen(['msgattrib', '--translated', '--no-fuzzy', filename], stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(['msgexec', sys.argv[0]], stdin=p1.stdout)
+        p1.stdout.close()
+        p2.communicate()[0]
+else:
+    # this is an automatic call from 'msgexec' command:
+    # read original string from environment variable 'MSGEXEC_MSGID'
+    msg_in = os.getenv('MSGEXEC_MSGID')
+
+    # no message found, display syntax and exit
+    if msg_in is None:
+        print('Syntax: %s file.po [file.po ...]' % sys.argv[0])
+        sys.exit(0)
+
+    # read translated string (given in standard input)
+    msg_out = sys.stdin.readlines()
+    nb_out = len(msg_out)
+
+    # check number of lines
+    nb_in = len(msg_in.split('\n'))
+    if msg_in.endswith('\n'):
+        nb_in = nb_in - 1
+    if msg_in != '' and nb_in != nb_out:
+        error('number of lines: %d in string, %d in translation' % (nb_in, nb_out), msg_in)
+
+    # check spaces at beginning of string
+    str_out = '\n'.join(msg_out)
+    if nb_in == 1:
+        startin = len(msg_in) - len(msg_in.lstrip(' '))
+        startout = len(str_out) - len(str_out.lstrip(' '))
+        if startin != startout:
+            error('spaces at beginning: %d in string, %d in translation' % (startin, startout), msg_in)
+
+    # check spaces at end of string
+    endin = len(msg_in) - len(msg_in.rstrip(' '))
+    endout = len(str_out) - len(str_out.rstrip(' '))
+    if endin != endout:
+        error('spaces at end: %d in string, %d in translation' % (endin, endout), msg_in)
