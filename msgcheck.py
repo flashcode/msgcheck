@@ -26,6 +26,8 @@
 # Syntax:
 #    msgcheck.py file.po [file.po ...]
 #
+# 2013-06-29, Sebastien Helleu <flashcode@flashtux.org>:
+#     version 0.6: check punctuation at end of string
 # 2013-01-02, Sebastien Helleu <flashcode@flashtux.org>:
 #     version 0.5: replace os.system by subprocess, display syntax when script
 #                  is called without filename, rename script to "msgcheck.py"
@@ -70,27 +72,36 @@ else:
         print('Syntax: %s file.po [file.po ...]' % sys.argv[0])
         sys.exit(0)
 
+    # count number of lines in message
+    nb_in = len(msg_in.split('\n'))
+
     # read translated string (given in standard input)
-    msg_out = sys.stdin.readlines()
-    nb_out = len(msg_out)
+    list_msg_out = sys.stdin.readlines()
+    nb_out = len(list_msg_out)
+    msg_out = '\n'.join(list_msg_out)
 
     # check number of lines
-    nb_in = len(msg_in.split('\n'))
     if msg_in.endswith('\n'):
         nb_in = nb_in - 1
     if msg_in != '' and nb_in != nb_out:
         error('number of lines: %d in string, %d in translation' % (nb_in, nb_out), msg_in)
 
     # check spaces at beginning of string
-    str_out = '\n'.join(msg_out)
     if nb_in == 1:
         startin = len(msg_in) - len(msg_in.lstrip(' '))
-        startout = len(str_out) - len(str_out.lstrip(' '))
+        startout = len(msg_out) - len(msg_out.lstrip(' '))
         if startin != startout:
             error('spaces at beginning: %d in string, %d in translation' % (startin, startout), msg_in)
 
     # check spaces at end of string
     endin = len(msg_in) - len(msg_in.rstrip(' '))
-    endout = len(str_out) - len(str_out.rstrip(' '))
+    endout = len(msg_out) - len(msg_out.rstrip(' '))
     if endin != endout:
         error('spaces at end: %d in string, %d in translation' % (endin, endout), msg_in)
+
+    # check punctuation at end of string
+    for punct in (':', ';', ',', '.', '...'):
+        length = len(punct)
+        if len(msg_in) >= length and len(msg_out) >= length \
+                and msg_in.endswith(punct) and not msg_out.endswith(punct):
+            error('end punctuation: "%s" in string, not in translation' % punct, msg_in)

@@ -7,6 +7,7 @@
 * for each translation which is not fuzzy/empty:
   * check number of lines in translated string
   * check spaces at beginning/end of string
+  * check punctuation at end of string
 
 The script can run with either Python 2.x or 3.x.
 
