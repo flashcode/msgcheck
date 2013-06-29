@@ -22,10 +22,13 @@
 # - for each translation which is not fuzzy/empty:
 #    - check number of lines in translated string
 #    - check spaces at beginning/end of string
+#    - check punctuation at end of string
 #
 # Syntax:
-#    msgcheck.py file.po [file.po ...]
+#    msgcheck.py [-n] [-s] [-p] file.po [file.po...]
 #
+# 2013-06-29, Sebastien Helleu <flashcode@flashtux.org>:
+#     version 0.7: add options to disable some checks
 # 2013-06-29, Sebastien Helleu <flashcode@flashtux.org>:
 #     version 0.6: check punctuation at end of string
 # 2013-01-02, Sebastien Helleu <flashcode@flashtux.org>:
@@ -52,16 +55,22 @@ if len(sys.argv) >= 2:
     # 1. check compilation (msgfmt -c)
     # 2. remove untranslated/fuzzy strings, and call msgexec, with this script
     #    as argument: this script will be called for each string in file
+    options = ''
+    for option in sys.argv[1:]:
+        if option[0] == '-':
+            options += option[1:]
+    os.putenv('MSGCHECK_OPTIONS', options)
     for filename in sys.argv[1:]:
-        # check compilation
-        print('Checking compilation of %s...' % filename)
-        subprocess.call(['msgfmt', '-c', '-o', '/dev/null', filename])
-        # check each translation in file
-        print('Checking lines in %s...' % filename)
-        p1 = subprocess.Popen(['msgattrib', '--translated', '--no-fuzzy', filename], stdout=subprocess.PIPE)
-        p2 = subprocess.Popen(['msgexec', sys.argv[0]], stdin=p1.stdout)
-        p1.stdout.close()
-        p2.communicate()[0]
+        if filename[0] != '-':
+            # check compilation
+            print('Checking compilation of %s...' % filename)
+            subprocess.call(['msgfmt', '-c', '-o', '/dev/null', filename])
+            # check each translation in file
+            print('Checking lines in %s...' % filename)
+            p1 = subprocess.Popen(['msgattrib', '--translated', '--no-fuzzy', filename], stdout=subprocess.PIPE)
+            p2 = subprocess.Popen(['msgexec', sys.argv[0]], stdin=p1.stdout)
+            p1.stdout.close()
+            p2.communicate()[0]
 else:
     # this is an automatic call from 'msgexec' command:
     # read original string from environment variable 'MSGEXEC_MSGID'
@@ -69,8 +78,22 @@ else:
 
     # no message found, display syntax and exit
     if msg_in is None:
-        print('Syntax: %s file.po [file.po ...]' % sys.argv[0])
+        name = os.path.basename(sys.argv[0])
+        print('')
+        print('Syntax:  %s [options] file.po [file.po...]' % name)
+        print('')
+        print('Options:')
+        print('  -n  do not check number of lines')
+        print('  -s  do not check spaces at beginning/end of string')
+        print('  -p  do not check punctuation at end of string')
+        print('')
+        print('Examples:')
+        print('  %s fr.po' % name)
+        print('  %s -p ja.po' % name)
         sys.exit(0)
+
+    # options for checks
+    options = os.getenv('MSGCHECK_OPTIONS')
 
     # count number of lines in message
     nb_in = len(msg_in.split('\n'))
@@ -80,28 +103,31 @@ else:
     nb_out = len(list_msg_out)
     msg_out = '\n'.join(list_msg_out)
 
-    # check number of lines
-    if msg_in.endswith('\n'):
-        nb_in = nb_in - 1
-    if msg_in != '' and nb_in != nb_out:
-        error('number of lines: %d in string, %d in translation' % (nb_in, nb_out), msg_in)
+    if not 'n' in options:
+        # check number of lines
+        if msg_in.endswith('\n'):
+            nb_in = nb_in - 1
+        if msg_in != '' and nb_in != nb_out:
+            error('number of lines: %d in string, %d in translation' % (nb_in, nb_out), msg_in)
 
-    # check spaces at beginning of string
-    if nb_in == 1:
-        startin = len(msg_in) - len(msg_in.lstrip(' '))
-        startout = len(msg_out) - len(msg_out.lstrip(' '))
-        if startin != startout:
-            error('spaces at beginning: %d in string, %d in translation' % (startin, startout), msg_in)
+    if not 's' in options:
+        # check spaces at beginning of string
+        if nb_in == 1:
+            startin = len(msg_in) - len(msg_in.lstrip(' '))
+            startout = len(msg_out) - len(msg_out.lstrip(' '))
+            if startin != startout:
+                error('spaces at beginning: %d in string, %d in translation' % (startin, startout), msg_in)
 
-    # check spaces at end of string
-    endin = len(msg_in) - len(msg_in.rstrip(' '))
-    endout = len(msg_out) - len(msg_out.rstrip(' '))
-    if endin != endout:
-        error('spaces at end: %d in string, %d in translation' % (endin, endout), msg_in)
+        # check spaces at end of string
+        endin = len(msg_in) - len(msg_in.rstrip(' '))
+        endout = len(msg_out) - len(msg_out.rstrip(' '))
+        if endin != endout:
+            error('spaces at end: %d in string, %d in translation' % (endin, endout), msg_in)
 
-    # check punctuation at end of string
-    for punct in (':', ';', ',', '.', '...'):
-        length = len(punct)
-        if len(msg_in) >= length and len(msg_out) >= length \
-                and msg_in.endswith(punct) and not msg_out.endswith(punct):
-            error('end punctuation: "%s" in string, not in translation' % punct, msg_in)
+    if not 'p' in options:
+        # check punctuation at end of string
+        for punct in (':', ';', ',', '.', '...'):
+            length = len(punct)
+            if len(msg_in) >= length and len(msg_out) >= length \
+                    and msg_in.endswith(punct) and not msg_out.endswith(punct):
+                error('end punctuation: "%s" in string, not in translation' % punct, msg_in)

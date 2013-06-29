@@ -15,8 +15,13 @@ The script can run with either Python 2.x or 3.x.
 
 Syntax:
 
-    $ python msgcheck.py file.po
+    $ python msgcheck.py [options] file.po [file.po...]
 
+Options:
+
+* `-n`: do not check number of lines
+* `-s`: do not check spaces at beginning/end of string
+* `-p`: do not check punctuation at end of string
 
 ## Example
 
