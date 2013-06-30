@@ -17,117 +17,279 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #
-# Perform some checks on gettext files:
-# - check compilation (msgfmt -c)
-# - for each translation which is not fuzzy/empty:
-#    - check number of lines in translated string
-#    - check spaces at beginning/end of string
-#    - check punctuation at end of string
-#
-# Syntax:
-#    msgcheck.py [-n] [-s] [-p] file.po [file.po...]
-#
-# 2013-06-29, Sebastien Helleu <flashcode@flashtux.org>:
-#     version 0.7: add options to disable some checks
-# 2013-06-29, Sebastien Helleu <flashcode@flashtux.org>:
-#     version 0.6: check punctuation at end of string
-# 2013-01-02, Sebastien Helleu <flashcode@flashtux.org>:
-#     version 0.5: replace os.system by subprocess, display syntax when script
-#                  is called without filename, rename script to "msgcheck.py"
-# 2012-09-21, Sebastien Helleu <flashcode@flashtux.org>:
-#     version 0.4: add check of compilation with "msgfmt -c"
-# 2011-04-14, Sebastien Helleu <flashcode@flashtux.org>:
-#     version 0.3: allow multiple po filenames
-# 2011-04-10, Sebastien Helleu <flashcode@flashtux.org>:
-#     version 0.2: add check of spaces at beginning/end of strings
-# 2010-03-22, Sebastien Helleu <flashcode@flashtux.org>:
-#     version 0.1: initial release
+# Perform some checks on gettext files (see README.md for more info).
 #
 
-import os, sys, subprocess
+import os, re, sys, subprocess
 
-def error(msg_error, msg_in):
-    """Display an error found in gettext file."""
-    print('%s\nERROR: %s:\n\n%s\n' % ('='*60, msg_error, msg_in))
+NAME='msgcheck.py'
+VERSION='0.8'
 
-if len(sys.argv) >= 2:
-    # if user gives .po filename, then run checks on file:
-    # 1. check compilation (msgfmt -c)
-    # 2. remove untranslated/fuzzy strings, and call msgexec, with this script
-    #    as argument: this script will be called for each string in file
-    options = ''
-    for option in sys.argv[1:]:
-        if option[0] == '-':
-            options += option[1:]
-    os.putenv('MSGCHECK_OPTIONS', options)
-    for filename in sys.argv[1:]:
-        if filename[0] != '-':
-            # check compilation
-            print('Checking compilation of %s...' % filename)
-            subprocess.call(['msgfmt', '-c', '-o', '/dev/null', filename])
-            # check each translation in file
-            print('Checking lines in %s...' % filename)
-            p1 = subprocess.Popen(['msgattrib', '--translated', '--no-fuzzy', filename], stdout=subprocess.PIPE)
-            p2 = subprocess.Popen(['msgexec', sys.argv[0]], stdin=p1.stdout)
-            p1.stdout.close()
-            p2.communicate()[0]
-else:
-    # this is an automatic call from 'msgexec' command:
-    # read original string from environment variable 'MSGEXEC_MSGID'
-    msg_in = os.getenv('MSGEXEC_MSGID')
+class PoMessage:
 
-    # no message found, display syntax and exit
-    if msg_in is None:
-        name = os.path.basename(sys.argv[0])
-        print('')
-        print('Syntax:  %s [options] file.po [file.po...]' % name)
-        print('')
-        print('Options:')
-        print('  -n  do not check number of lines')
-        print('  -s  do not check spaces at beginning/end of string')
-        print('  -p  do not check punctuation at end of string')
-        print('')
-        print('Examples:')
-        print('  %s fr.po' % name)
-        print('  %s -p ja.po' % name)
+    def __init__(self, filename, line, fuzzy, msg):
+        self.filename = filename
+        self.line = line
+        self.fuzzy = fuzzy
+        # build messages, which a list of tuple (string, translation)
+        self.messages = []
+        if 'msgid_plural' in msg:
+            i = 0
+            while True:
+                key = 'msgstr[%d]' % i
+                if key not in msg:
+                    break
+                self.messages.append((msg['msgid_plural'], msg[key]))
+                i += 1
+        else:
+            self.messages.append((msg.get('msgid', ''), msg.get('msgstr', '')))
+        self.utf8 = re.search(r'utf-?8', os.getenv('LANG').lower())
+
+    def count_lines(self, s):
+        """Count number of lines in a string or translation."""
+        count = len(s.split('\n'))
+        if count > 1 and s.endswith('\n'):
+            count -= 1
+        return count
+
+    def error(self, message, mid, mstr):
+        """Display an error found in gettext file (on stderr)."""
+        if self.utf8:
+            bar = { '|=': '╒', '|-': '├', '|_': '└', '-': '─', '=': '═', '|': '│' }  # modern
+        else:
+            bar = { '|=': '=', '|-': '-', '|_': '-', '-': '-', '=': '=', '|': '' }   # old school
+        sys.stderr.write('%s%s\n' % (bar['|='], bar['=']*24))
+        sys.stderr.write('%s%s: line %d%s: %s:\n' % (bar['|'], self.filename, self.line, ' (fuzzy)' if self.fuzzy else '', message))
+        sys.stderr.write('%s%s\n' % (bar['|-'], bar['-']*3))
+        for line in mid.split('\n'):
+            sys.stderr.write('%s%s\n' % (bar['|'], line))
+        sys.stderr.write('%s%s\n' % (bar['|-'], bar['-']*3))
+        for line in mstr.split('\n'):
+            sys.stderr.write('%s%s\n' % (bar['|'], line))
+        sys.stderr.write('%s%s\n' % (bar['|_'], bar['-']*8))
+
+    def check_lines_number(self, quiet):
+        """Check number of lines in string and translation. Return the number of errors detected."""
+        errors = 0
+        for mid, mstr in self.messages:
+            if not mid or not mstr:
+                continue
+            nb_id = self.count_lines(mid)
+            nb_str = self.count_lines(mstr)
+            if nb_id != nb_str:
+                if not quiet:
+                    self.error('number of lines: %d in string, %d in translation' % (nb_id, nb_str), mid, mstr)
+                errors += 1
+        return errors
+
+    def check_spaces(self, quiet):
+        """Check spaces at beginning and end of string. Return the number of errors detected."""
+        errors = 0
+        for mid, mstr in self.messages:
+            if not mid or not mstr:
+                continue
+            # check spaces at beginning of string
+            if self.count_lines(mid) == 1:
+                startin = len(mid) - len(mid.lstrip(' '))
+                startout = len(mstr) - len(mstr.lstrip(' '))
+                if startin != startout:
+                    if not quiet:
+                        self.error('spaces at beginning: %d in string, %d in translation' % (startin, startout), mid, mstr)
+                    errors += 1
+            # check spaces at end of string
+            endin = len(mid) - len(mid.rstrip(' '))
+            endout = len(mstr) - len(mstr.rstrip(' '))
+            if endin != endout:
+                if not quiet:
+                    self.error('spaces at end: %d in string, %d in translation' % (endin, endout), mid, mstr)
+                errors += 1
+        return errors
+
+    def check_punctuation(self, quiet):
+        """Check punctuation at end of string. Return the number of errors detected."""
+        errors = 0
+        for mid, mstr in self.messages:
+            if not mid or not mstr:
+                continue
+            for punct in (':', ';', ',', '.', '...'):
+                length = len(punct)
+                if len(mid) >= length and len(mstr) >= length:
+                    if mid.endswith(punct) and not mstr.endswith(punct):
+                        if not quiet:
+                            self.error('end punctuation: "%s" in string, not in translation' % punct, mid, mstr)
+                        errors += 1
+                        break
+                    if not mid.endswith(punct) and mstr.endswith(punct):
+                        if not quiet:
+                            self.error('end punctuation: "%s" in translation, not in string' % punct, mid, mstr)
+                        errors += 1
+                        break
+        return errors
+
+class PoFile:
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.charset = 'utf-8'
+        self.msgs = []
+
+    def add_message(self, filename, numline_msgid, msgfuzzy, msg):
+        """Add a message from PO file in list of messages."""
+        if 'msgid' in msg and len(msg['msgid']) == 0:
+            # find file charset in properties (first string without msgid)
+            m = re.search(r'charset=([a-zA-Z0-9-_]+)', msg.get('msgstr', ''))
+            if m:
+                self.charset = m.group(1)
+        if sys.version_info >= (3,):
+            # python 3.x
+            for m in msg:
+                msg[m] = str(bytes(msg[m], self.charset).decode('unicode_escape').encode('latin1'), self.charset)
+        else:
+            # python 2.x
+            for m in msg:
+                msg[m] = msg[m].decode('string_escape')
+        self.msgs.append(PoMessage(filename, numline_msgid, msgfuzzy, msg))
+
+    def read(self):
+        """Read messages in PO file."""
+        self.msgs = []
+        (numline, numline_msgid) = (0, 0)
+        (fuzzy, msgfuzzy) = (False, False)
+        msg = {}
+        msgcurrent = ''
+        try:
+            with open(self.filename, 'r') as f:
+                for line in f.readlines():
+                    numline += 1
+                    line = line.strip()
+                    if len(line) == 0:
+                        continue
+                    if line[0] == '#':
+                        if line.startswith('#, fuzzy'):
+                            fuzzy = True
+                        continue
+                    if line.startswith('msg'):
+                        m = re.match(r'([a-zA-Z0-9-_]+(\[\d+\])?)[ \t](.*)', line)
+                        if m:
+                            oldmsgcurrent = msgcurrent
+                            msgcurrent = m.group(1)
+                            line = m.group(3)
+                            if msgcurrent == 'msgid':
+                                if oldmsgcurrent.startswith('msgstr'):
+                                    self.add_message(self.filename, numline_msgid, msgfuzzy, msg)
+                                msgfuzzy = fuzzy
+                                fuzzy = False
+                                msg = {}
+                                numline_msgid = numline
+                    if msgcurrent and line.startswith('"'):
+                        msg[msgcurrent] = msg.get(msgcurrent, '') + line[1:-1]
+                if msgcurrent == 'msgstr':
+                    self.add_message(self.filename, numline_msgid, msgfuzzy, msg)
+        except Exception as e:
+            print('Error reading file %s, line %d:' % (self.filename, numline))
+            print(e)
+            self.msgs = []
+
+    def compile(self):
+        """Compile PO file and return the return code."""
+        return subprocess.call(['msgfmt', '-c', '-o', '/dev/null', self.filename])
+
+    def check(self, options):
+        """Check translations in PO file. Return the number of errors detected."""
+        if not self.msgs:
+            return 0
+        errors = 0
+        quiet = 'q' in options
+        for msg in self.msgs:
+            if msg.fuzzy and 'f' not in options:
+                continue
+            if 'n' not in options:
+                errors += msg.check_lines_number(quiet)
+            if 's' not in options:
+                errors += msg.check_spaces(quiet)
+            if 'p' not in options:
+                errors += msg.check_punctuation(quiet)
+        return errors
+
+# display help if no file given
+if len(sys.argv) < 2:
+    print('''
+%s %s (C) 2009-2013 Sebastien Helleu <flashcode@flashtux.org>
+
+Syntax:
+  %s [options] file.po [file.po...]
+
+Options:
+  -f  check fuzzy strings (fuzzy are ignored by default)
+  -n  do not check number of lines
+  -s  do not check spaces at beginning/end of string
+  -p  do not check punctuation at end of string
+      (recommended for languages with different symbols like Japanese)
+  -q  quiet mode: only display number of errors
+  -v  display version
+
+Notes: 1. Options apply to all files given *after* the option.
+       2. Options can be reversed with "+" prefix, for example +p will check punctuation.
+
+Return value:
+  0: all files checked are OK (0 errors)
+  n: number of files with errors (n >= 1)
+
+Examples:
+  %s fr.po
+  %s fr.po -p ja.po
+''' % (NAME, VERSION, NAME, NAME, NAME))
+    sys.exit(0)
+
+# process options and files
+options = []
+errors_total = 0
+files = 0
+files_with_errors = 0
+messages = []
+for opt in sys.argv[1:]:
+    if opt == '-v':
+        print('%s' % VERSION)
         sys.exit(0)
+    elif opt[0] == '-':
+        for o in opt[1:]:
+            if o not in options:
+                options.append(o)
+    elif opt[0] == '+':
+        for o in opt[1:]:
+            if o in options:
+                options.remove(o)
+    else:
+        files += 1
+        errors = 0
+        po = PoFile(opt)
+        if po.compile() == 0:
+            po.read()
+            errors = po.check(options)
+            if errors == 0:
+                messages.append('%s: OK' % opt)
+            else:
+                messages.append('%s: %d errors (%s)' % (opt, errors,
+                                                        'almost good!' if errors <= 10 else 'uh oh... try again!'))
+        else:
+            print('%s: compilation FAILED' % opt)
+            errors = 1
+        if errors > 0:
+            files_with_errors += 1
+        errors_total += errors
 
-    # options for checks
-    options = os.getenv('MSGCHECK_OPTIONS')
+# display files with number of errors
+for msg in messages:
+    print(msg)
 
-    # count number of lines in message
-    nb_in = len(msg_in.split('\n'))
+# display total (if many files processed)
+if files > 1:
+    print('---')
+    if errors_total == 0:
+        print('TOTAL: all OK')
+    else:
+        print('TOTAL: %d files OK, %d files with %d errors' % (files - files_with_errors,
+                                                               files_with_errors, errors_total))
 
-    # read translated string (given in standard input)
-    list_msg_out = sys.stdin.readlines()
-    nb_out = len(list_msg_out)
-    msg_out = '\n'.join(list_msg_out)
-
-    if not 'n' in options:
-        # check number of lines
-        if msg_in.endswith('\n'):
-            nb_in = nb_in - 1
-        if msg_in != '' and nb_in != nb_out:
-            error('number of lines: %d in string, %d in translation' % (nb_in, nb_out), msg_in)
-
-    if not 's' in options:
-        # check spaces at beginning of string
-        if nb_in == 1:
-            startin = len(msg_in) - len(msg_in.lstrip(' '))
-            startout = len(msg_out) - len(msg_out.lstrip(' '))
-            if startin != startout:
-                error('spaces at beginning: %d in string, %d in translation' % (startin, startout), msg_in)
-
-        # check spaces at end of string
-        endin = len(msg_in) - len(msg_in.rstrip(' '))
-        endout = len(msg_out) - len(msg_out.rstrip(' '))
-        if endin != endout:
-            error('spaces at end: %d in string, %d in translation' % (endin, endout), msg_in)
-
-    if not 'p' in options:
-        # check punctuation at end of string
-        for punct in (':', ';', ',', '.', '...'):
-            length = len(punct)
-            if len(msg_in) >= length and len(msg_out) >= length \
-                    and msg_in.endswith(punct) and not msg_out.endswith(punct):
-                error('end punctuation: "%s" in string, not in translation' % punct, msg_in)
+# exit
+sys.exit(files_with_errors)
