@@ -23,7 +23,7 @@
 import os, re, sys, subprocess
 
 NAME='msgcheck.py'
-VERSION='0.9'
+VERSION='1.0'
 
 class PoMessage:
 
@@ -237,6 +237,7 @@ Syntax:
 
 Options:
   -f  check fuzzy strings (fuzzy are ignored by default)
+  -c  do not check compilation of file (with `msgfmt -c`)
   -n  do not check number of lines
   -s  do not check spaces at beginning/end of string
   -p  do not check punctuation at end of string
@@ -278,7 +279,7 @@ for opt in sys.argv[1:]:
         files += 1
         errors = 0
         po = PoFile(opt)
-        if po.compile() == 0:
+        if 'c' in options or po.compile() == 0:
             po.read()
             errors = po.check(options)
             if errors == 0:

@@ -19,6 +19,7 @@ Syntax:
 
 Options:
 
+* `-c`: do not check compilation of file (with `msgfmt -c`)
 * `-f`: check fuzzy strings (fuzzy are ignored by default)
 * `-n`: do not check number of lines
 * `-s`: do not check spaces at beginning/end of string
