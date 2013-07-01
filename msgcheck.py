@@ -20,10 +20,10 @@
 # Perform some checks on gettext files (see README.md for more info).
 #
 
-import os, re, sys, subprocess
+import os, re, shlex, sys, subprocess
 
 NAME='msgcheck.py'
-VERSION='1.0'
+VERSION='1.1'
 
 class PoMessage:
 
@@ -247,6 +247,10 @@ Options:
 Notes: 1. Options apply to all files given *after* the option.
        2. Options can be reversed with "+" prefix, for example +p will check punctuation.
 
+Environment variable 'MSGCHECK_OPTIONS' can be set with options, its value is
+used before command line arguments (therefore arguments given on command line
+have higher priority).
+
 Return value:
   0: all files checked are OK (0 errors)
   n: number of files with errors (n >= 1)
@@ -263,7 +267,7 @@ errors_total = 0
 files = 0
 files_with_errors = 0
 messages = []
-for opt in sys.argv[1:]:
+for opt in shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:]:
     if opt == '-v':
         print('%s' % VERSION)
         sys.exit(0)

@@ -27,6 +27,10 @@ Options:
 * `-q`: quiet mode: only display number of errors
 * `-v`: display version
 
+Environment variable 'MSGCHECK_OPTIONS' can be set with options, its value is
+used before command line arguments (therefore arguments given on command line
+have higher priority).
+
 ## Example
 
     $ python msgcheck.py fr.po
