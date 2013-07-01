@@ -58,15 +58,15 @@ class PoMessage:
             bar = { '|=': '╒', '|-': '├', '|_': '└', '-': '─', '=': '═', '|': '│' }  # modern
         else:
             bar = { '|=': '=', '|-': '-', '|_': '-', '-': '-', '=': '=', '|': '' }   # old school
-        sys.stderr.write('%s%s\n' % (bar['|='], bar['=']*24))
-        sys.stderr.write('%s%s: line %d%s: %s:\n' % (bar['|'], self.filename, self.line, ' (fuzzy)' if self.fuzzy else '', message))
-        sys.stderr.write('%s%s\n' % (bar['|-'], bar['-']*3))
+        print('%s%s' % (bar['|='], bar['=']*24))
+        print('%s%s: line %d%s: %s:' % (bar['|'], self.filename, self.line, ' (fuzzy)' if self.fuzzy else '', message))
+        print('%s%s' % (bar['|-'], bar['-']*3))
         for line in mid.split('\n'):
-            sys.stderr.write('%s%s\n' % (bar['|'], line))
-        sys.stderr.write('%s%s\n' % (bar['|-'], bar['-']*3))
+            print('%s%s' % (bar['|'], line))
+        print('%s%s' % (bar['|-'], bar['-']*3))
         for line in mstr.split('\n'):
-            sys.stderr.write('%s%s\n' % (bar['|'], line))
-        sys.stderr.write('%s%s\n' % (bar['|_'], bar['-']*8))
+            print('%s%s' % (bar['|'], line))
+        print('%s%s' % (bar['|_'], bar['-']*8))
 
     def check_lines_number(self, quiet):
         """Check number of lines in string and translation. Return the number of errors detected."""
