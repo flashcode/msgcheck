@@ -23,14 +23,24 @@
 import os, re, sys, subprocess
 
 NAME='msgcheck.py'
-VERSION='0.8'
+VERSION='0.9'
 
 class PoMessage:
 
-    def __init__(self, filename, line, fuzzy, msg):
+    def __init__(self, filename, fileprops, line, fuzzy, msg):
         self.filename = filename
+        self.fileprops = fileprops
         self.line = line
         self.fuzzy = fuzzy
+        # interpret special chars like "\n" in messages
+        if sys.version_info >= (3,):
+            # python 3.x
+            for m in msg:
+                msg[m] = str(bytes(msg[m], self.fileprops['charset']).decode('unicode_escape').encode('latin1'), self.fileprops['charset'])
+        else:
+            # python 2.x
+            for m in msg:
+                msg[m] = msg[m].decode('string_escape')
         # build messages, which a list of tuple (string, translation)
         self.messages = []
         if 'msgid_plural' in msg:
@@ -111,17 +121,28 @@ class PoMessage:
         for mid, mstr in self.messages:
             if not mid or not mstr:
                 continue
-            for punct in (':', ';', ',', '.', '...'):
-                length = len(punct)
-                if len(mid) >= length and len(mstr) >= length:
-                    if mid.endswith(punct) and not mstr.endswith(punct):
+            puncts = [(':', ':'), (';', ';'), (',', ','), ('...', '...')]
+            # special symbols in some languages
+            if self.fileprops['language'].startswith('ja'):
+                puncts.append(('.', '。'))
+            else:
+                puncts.append(('.', '.'))
+            for punctid, punctstr in puncts:
+                len_pid = len(punctid)
+                len_pstr = len(punctstr)
+                if len(mid) >= len_pid and len(mstr) >= len_pstr:
+                    match_id = mid.endswith(punctid)
+                    match_str = mstr.endswith(punctstr)
+                    if match_id and match_str:
+                        break
+                    if match_id and not match_str:
                         if not quiet:
-                            self.error('end punctuation: "%s" in string, not in translation' % punct, mid, mstr)
+                            self.error('end punctuation: "%s" in string, "%s" not in translation' % (punctid, punctstr), mid, mstr)
                         errors += 1
                         break
-                    if not mid.endswith(punct) and mstr.endswith(punct):
+                    if not match_id and match_str:
                         if not quiet:
-                            self.error('end punctuation: "%s" in translation, not in string' % punct, mid, mstr)
+                            self.error('end punctuation: "%s" in translation, "%s" not in string' % (punctstr, punctid), mid, mstr)
                         errors += 1
                         break
         return errors
@@ -130,25 +151,20 @@ class PoFile:
 
     def __init__(self, filename):
         self.filename = filename
-        self.charset = 'utf-8'
+        self.props = { 'language': '', 'charset': 'utf-8' }
         self.msgs = []
 
     def add_message(self, filename, numline_msgid, msgfuzzy, msg):
         """Add a message from PO file in list of messages."""
         if 'msgid' in msg and len(msg['msgid']) == 0:
-            # find file charset in properties (first string without msgid)
-            m = re.search(r'charset=([a-zA-Z0-9-_]+)', msg.get('msgstr', ''))
+            # find file language/charset in properties (first string without msgid)
+            m = re.search(r'language: ([a-zA-Z-_]+)', msg.get('msgstr', ''), re.IGNORECASE)
             if m:
-                self.charset = m.group(1)
-        if sys.version_info >= (3,):
-            # python 3.x
-            for m in msg:
-                msg[m] = str(bytes(msg[m], self.charset).decode('unicode_escape').encode('latin1'), self.charset)
-        else:
-            # python 2.x
-            for m in msg:
-                msg[m] = msg[m].decode('string_escape')
-        self.msgs.append(PoMessage(filename, numline_msgid, msgfuzzy, msg))
+                self.props['language'] = m.group(1)
+            m = re.search(r'charset=([a-zA-Z0-9-_]+)', msg.get('msgstr', ''), re.IGNORECASE)
+            if m:
+                self.props['charset'] = m.group(1)
+        self.msgs.append(PoMessage(filename, self.props, numline_msgid, msgfuzzy, msg))
 
     def read(self):
         """Read messages in PO file."""
@@ -224,7 +240,6 @@ Options:
   -n  do not check number of lines
   -s  do not check spaces at beginning/end of string
   -p  do not check punctuation at end of string
-      (recommended for languages with different symbols like Japanese)
   -q  quiet mode: only display number of errors
   -v  display version
 
