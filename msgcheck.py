@@ -23,7 +23,7 @@
 import os, re, shlex, sys, subprocess
 
 NAME='msgcheck.py'
-VERSION='1.1'
+VERSION='1.2'
 
 class PoMessage:
 
@@ -53,7 +53,6 @@ class PoMessage:
                 i += 1
         else:
             self.messages.append((msg.get('msgid', ''), msg.get('msgstr', '')))
-        self.utf8 = re.search(r'utf-?8', os.getenv('LANG').lower())
 
     def count_lines(self, s):
         """Count number of lines in a string or translation."""
@@ -64,19 +63,14 @@ class PoMessage:
 
     def error(self, message, mid, mstr):
         """Display an error found in gettext file (on stderr)."""
-        if self.utf8:
-            bar = { '|=': '╒', '|-': '├', '|_': '└', '-': '─', '=': '═', '|': '│' }  # modern
-        else:
-            bar = { '|=': '=', '|-': '-', '|_': '-', '-': '-', '=': '=', '|': '' }   # old school
-        print('%s%s' % (bar['|='], bar['=']*24))
-        print('%s%s: line %d%s: %s:' % (bar['|'], self.filename, self.line, ' (fuzzy)' if self.fuzzy else '', message))
-        print('%s%s' % (bar['|-'], bar['-']*3))
+        print('='*70)
+        print('%s: line %d%s: %s:' % (self.filename, self.line, ' (fuzzy)' if self.fuzzy else '', message))
+        print('---')
         for line in mid.split('\n'):
-            print('%s%s' % (bar['|'], line))
-        print('%s%s' % (bar['|-'], bar['-']*3))
+            print('%s' % line)
+        print('---')
         for line in mstr.split('\n'):
-            print('%s%s' % (bar['|'], line))
-        print('%s%s' % (bar['|_'], bar['-']*8))
+            print('%s' % line)
 
     def check_lines_number(self, quiet):
         """Check number of lines in string and translation. Return the number of errors detected."""
@@ -299,6 +293,8 @@ for opt in shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:]:
         errors_total += errors
 
 # display files with number of errors
+if errors > 0 and not 'q' in options:
+    print('='*70)
 for msg in messages:
     print(msg)
 
