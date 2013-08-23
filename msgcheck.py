@@ -20,10 +20,15 @@
 # Perform some checks on gettext files (see README.md for more info).
 #
 
-import os, re, shlex, sys, subprocess
+import os
+import re
+import shlex
+import sys
+import subprocess
 
-NAME='msgcheck.py'
-VERSION='1.2'
+NAME = 'msgcheck.py'
+VERSION = '1.3'
+
 
 class PoMessage:
 
@@ -63,7 +68,7 @@ class PoMessage:
 
     def error(self, message, mid, mstr):
         """Display an error found in gettext file (on stderr)."""
-        print('='*70)
+        print('=' * 70)
         print('%s: line %d%s: %s:' % (self.filename, self.line, ' (fuzzy)' if self.fuzzy else '', message))
         print('---')
         for line in mid.split('\n'):
@@ -141,11 +146,12 @@ class PoMessage:
                         break
         return errors
 
+
 class PoFile:
 
     def __init__(self, filename):
-        self.filename = filename
-        self.props = { 'language': '', 'charset': 'utf-8' }
+        self.filename = os.path.abspath(filename)
+        self.props = {'language': '', 'charset': 'utf-8'}
         self.msgs = []
 
     def add_message(self, filename, numline_msgid, msgfuzzy, msg):
@@ -281,12 +287,12 @@ for opt in shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:]:
             po.read()
             errors = po.check(options)
             if errors == 0:
-                messages.append('%s: OK' % opt)
+                messages.append('%s: OK' % po.filename)
             else:
-                messages.append('%s: %d errors (%s)' % (opt, errors,
+                messages.append('%s: %d errors (%s)' % (po.filename, errors,
                                                         'almost good!' if errors <= 10 else 'uh oh... try again!'))
         else:
-            print('%s: compilation FAILED' % opt)
+            print('%s: compilation FAILED' % po.filename)
             errors = 1
         if errors > 0:
             files_with_errors += 1
@@ -294,7 +300,7 @@ for opt in shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:]:
 
 # display files with number of errors
 if errors > 0 and not 'q' in options:
-    print('='*70)
+    print('=' * 70)
 for msg in messages:
     print(msg)
 
