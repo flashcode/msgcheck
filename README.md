@@ -19,17 +19,16 @@ Syntax:
 
 Options:
 
-* `-c`: do not check compilation of file (with `msgfmt -c`)
-* `-f`: check fuzzy strings (fuzzy are ignored by default)
-* `-n`: do not check number of lines
-* `-s`: do not check spaces at beginning/end of string
-* `-p`: do not check punctuation at end of string
-* `-q`: quiet mode: only display number of errors
-* `-v`: display version
+* `-h`, `--help`: display help message and exit
+* `-c`, `--compile`: do not check compilation of file (with `msgfmt -c`)
+* `-f`, `--fuzzy`: check fuzzy strings (default: ignored)
+* `-l`, `--lines`: do not check number of lines
+* `-p`, `--punct`: do not check punctuation at end of string
+* `-w`, `--whitespace`: do not check whitespace at beginning/end of string
+* `-q`, `--quiet`: quiet mode: only display number of errors
+* `-v`, `--version`: display version and exit
 
-Environment variable 'MSGCHECK_OPTIONS' can be set with options, its value is
-used before command line arguments (therefore arguments given on command line
-have higher priority).
+Environment variable 'MSGCHECK_OPTIONS' can be set with some default options.
 
 ## Example
 

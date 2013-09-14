@@ -20,6 +20,7 @@
 # Perform some checks on gettext files (see README.md for more info).
 #
 
+import argparse
 import os
 import re
 import shlex
@@ -27,7 +28,8 @@ import sys
 import subprocess
 
 NAME = 'msgcheck.py'
-VERSION = '1.3'
+VERSION = '1.4'
+AUTHOR = 'Sebastien Helleu <flashcode@flashtux.org>'
 
 
 class PoMessage:
@@ -91,29 +93,6 @@ class PoMessage:
                 errors += 1
         return errors
 
-    def check_spaces(self, quiet):
-        """Check spaces at beginning and end of string. Return the number of errors detected."""
-        errors = 0
-        for mid, mstr in self.messages:
-            if not mid or not mstr:
-                continue
-            # check spaces at beginning of string
-            if self.count_lines(mid) == 1:
-                startin = len(mid) - len(mid.lstrip(' '))
-                startout = len(mstr) - len(mstr.lstrip(' '))
-                if startin != startout:
-                    if not quiet:
-                        self.error('spaces at beginning: %d in string, %d in translation' % (startin, startout), mid, mstr)
-                    errors += 1
-            # check spaces at end of string
-            endin = len(mid) - len(mid.rstrip(' '))
-            endout = len(mstr) - len(mstr.rstrip(' '))
-            if endin != endout:
-                if not quiet:
-                    self.error('spaces at end: %d in string, %d in translation' % (endin, endout), mid, mstr)
-                errors += 1
-        return errors
-
     def check_punctuation(self, quiet):
         """Check punctuation at end of string. Return the number of errors detected."""
         errors = 0
@@ -144,6 +123,29 @@ class PoMessage:
                             self.error('end punctuation: "%s" in translation, "%s" not in string' % (punctstr, punctid), mid, mstr)
                         errors += 1
                         break
+        return errors
+
+    def check_whitespace(self, quiet):
+        """Check whitespace at beginning and end of string. Return the number of errors detected."""
+        errors = 0
+        for mid, mstr in self.messages:
+            if not mid or not mstr:
+                continue
+            # check whitespace at beginning of string
+            if self.count_lines(mid) == 1:
+                startin = len(mid) - len(mid.lstrip(' '))
+                startout = len(mstr) - len(mstr.lstrip(' '))
+                if startin != startout:
+                    if not quiet:
+                        self.error('whitespace at beginning: %d in string, %d in translation' % (startin, startout), mid, mstr)
+                    errors += 1
+            # check whitespace at end of string
+            endin = len(mid) - len(mid.rstrip(' '))
+            endout = len(mstr) - len(mstr.rstrip(' '))
+            if endin != endout:
+                if not quiet:
+                    self.error('whitespace at end: %d in string, %d in translation' % (endin, endout), mid, mstr)
+                errors += 1
         return errors
 
 
@@ -209,43 +211,30 @@ class PoFile:
         """Compile PO file and return the return code."""
         return subprocess.call(['msgfmt', '-c', '-o', '/dev/null', self.filename])
 
-    def check(self, options):
+    def check(self, args):
         """Check translations in PO file. Return the number of errors detected."""
         if not self.msgs:
             return 0
         errors = 0
-        quiet = 'q' in options
         for msg in self.msgs:
-            if msg.fuzzy and 'f' not in options:
+            if msg.fuzzy and not args.fuzzy:
                 continue
-            if 'n' not in options:
-                errors += msg.check_lines_number(quiet)
-            if 's' not in options:
-                errors += msg.check_spaces(quiet)
-            if 'p' not in options:
-                errors += msg.check_punctuation(quiet)
+            if args.lines:
+                errors += msg.check_lines_number(args.quiet)
+            if args.punct:
+                errors += msg.check_punctuation(args.quiet)
+            if args.whitespace:
+                errors += msg.check_whitespace(args.quiet)
         return errors
 
-# display help if no file given
-if len(sys.argv) < 2:
-    print('''
-%s %s (C) 2009-2013 Sebastien Helleu <flashcode@flashtux.org>
+# parse command line arguments
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                 description='''
+%s %s (C) 2009-2013 %s
 
-Syntax:
-  %s [options] file.po [file.po...]
-
-Options:
-  -f  check fuzzy strings (fuzzy are ignored by default)
-  -c  do not check compilation of file (with `msgfmt -c`)
-  -n  do not check number of lines
-  -s  do not check spaces at beginning/end of string
-  -p  do not check punctuation at end of string
-  -q  quiet mode: only display number of errors
-  -v  display version
-
-Notes: 1. Options apply to all files given *after* the option.
-       2. Options can be reversed with "+" prefix, for example +p will check punctuation.
-
+Perform some checks on gettext files.
+''' % (NAME, VERSION, AUTHOR),
+                                 epilog='''
 Environment variable 'MSGCHECK_OPTIONS' can be set with options, its value is
 used before command line arguments (therefore arguments given on command line
 have higher priority).
@@ -253,63 +242,61 @@ have higher priority).
 Return value:
   0: all files checked are OK (0 errors)
   n: number of files with errors (n >= 1)
+''')
+parser.add_argument('-f', '--fuzzy', action='store_true',
+                    help='check fuzzy strings (they are ignored by default)')
+parser.add_argument('-c', '--compile', action='store_false',
+                    help='do not check compilation of file (with `msgfmt -c`)')
+parser.add_argument('-l', '--lines', action='store_false',
+                    help='do not check number of lines')
+parser.add_argument('-p', '--punct', action='store_false',
+                    help='do not check punctuation at end of string')
+parser.add_argument('-w', '--whitespace', action='store_false',
+                    help='do not check whitespace at beginning/end of string')
+parser.add_argument('-q', '--quiet', action='store_true',
+                    help='quiet mode: only display number of errors')
+parser.add_argument('-v', '--version', action='version', version=VERSION)
+parser.add_argument('file', nargs='+', help='gettext file(s) to check (*.po files)')
+if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
+args = parser.parse_args(shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:])
 
-Examples:
-  %s fr.po
-  %s fr.po -p ja.po
-''' % (NAME, VERSION, NAME, NAME, NAME))
-    sys.exit(0)
-
-# process options and files
-options = []
+# check files
 errors_total = 0
-files = 0
 files_with_errors = 0
 messages = []
-for opt in shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:]:
-    if opt == '-v':
-        print('%s' % VERSION)
-        sys.exit(0)
-    elif opt[0] == '-':
-        for o in opt[1:]:
-            if o not in options:
-                options.append(o)
-    elif opt[0] == '+':
-        for o in opt[1:]:
-            if o in options:
-                options.remove(o)
-    else:
-        files += 1
-        errors = 0
-        po = PoFile(opt)
-        if 'c' in options or po.compile() == 0:
-            po.read()
-            errors = po.check(options)
-            if errors == 0:
-                messages.append('%s: OK' % po.filename)
-            else:
-                messages.append('%s: %d errors (%s)' % (po.filename, errors,
-                                                        'almost good!' if errors <= 10 else 'uh oh... try again!'))
+for filename in args.file:
+    errors = 0
+    po = PoFile(filename)
+    if not args.compile or po.compile() == 0:
+        po.read()
+        errors = po.check(args)
+        if errors == 0:
+            messages.append('%s: OK' % po.filename)
         else:
-            print('%s: compilation FAILED' % po.filename)
-            errors = 1
-        if errors > 0:
-            files_with_errors += 1
-        errors_total += errors
+            messages.append('%s: %d errors (%s)' % (po.filename, errors,
+                                                    'almost good!' if errors <= 10 else 'uh oh... try again!'))
+    else:
+        print('%s: compilation FAILED' % po.filename)
+        errors = 1
+    if errors > 0:
+        files_with_errors += 1
+    errors_total += errors
 
 # display files with number of errors
-if errors > 0 and not 'q' in options:
+if errors > 0 and not args.quiet:
     print('=' * 70)
 for msg in messages:
     print(msg)
 
 # display total (if many files processed)
-if files > 1:
+if len(args.file) > 1:
     print('---')
     if errors_total == 0:
         print('TOTAL: all OK')
     else:
-        print('TOTAL: %d files OK, %d files with %d errors' % (files - files_with_errors,
+        print('TOTAL: %d files OK, %d files with %d errors' % (len(args.file) - files_with_errors,
                                                                files_with_errors, errors_total))
 
 # exit
