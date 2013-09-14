@@ -69,7 +69,7 @@ class PoMessage:
     def error(self, message, mid, mstr):
         """Display an error found in gettext file (on stderr)."""
         print('=' * 70)
-        print('%s: line %d%s: %s:' % (self.filename, self.line, ' (fuzzy)' if self.fuzzy else '', message))
+        print('%s: line %d: %s%s:' % (self.filename, self.line, '(fuzzy) ' if self.fuzzy else '', message))
         print('---')
         for line in mid.split('\n'):
             print('%s' % line)
