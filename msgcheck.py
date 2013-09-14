@@ -181,8 +181,7 @@ class PoFile:
                     if len(line) == 0:
                         continue
                     if line[0] == '#':
-                        if line.startswith('#, fuzzy'):
-                            fuzzy = True
+                        fuzzy = 'fuzzy' in line
                         continue
                     if line.startswith('msg'):
                         m = re.match(r'([a-zA-Z0-9-_]+(\[\d+\])?)[ \t](.*)', line)
