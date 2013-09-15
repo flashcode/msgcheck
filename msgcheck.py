@@ -38,7 +38,7 @@ except:
     pass
 
 NAME = 'msgcheck.py'
-VERSION = '1.5'
+VERSION = '1.6'
 AUTHOR = 'Sebastien Helleu <flashcode@flashtux.org>'
 
 
@@ -254,6 +254,15 @@ class PoFile:
         """Compile PO file and return the return code."""
         return subprocess.call(['msgfmt', '-c', '-o', '/dev/null', self.filename])
 
+    def display_translations(self):
+        """Display all translations."""
+        for msg in self.msgs:
+            if msg.fuzzy and not self.args.fuzzy:
+                continue
+            for mid, mstr in msg.messages:
+                if mid and mstr:
+                    print('%s\n---' % mstr)
+
     def check(self):
         """Check translations in PO file. Return the number of errors detected."""
         if not self.msgs:
@@ -283,7 +292,7 @@ Perform some checks on gettext files.
 Environment variable 'MSGCHECK_OPTIONS' can be set with some default options.
 
 Return value:
-  0: all files checked are OK (0 errors)
+  0: all files checked are OK (0 errors) (or --extract given)
   n: number of files with errors (n >= 1)
 ''')
 parser.add_argument('-c', '--compile', action='store_false',
@@ -300,6 +309,8 @@ parser.add_argument('--pwl', nargs=1,
                     help='file with personal word list used when checking spelling')
 parser.add_argument('-w', '--whitespace', action='store_false',
                     help='do not check whitespace at beginning/end of string')
+parser.add_argument('--extract', action='store_true',
+                    help='display all translations and exit (all checks except compilation are disabled in this mode)')
 parser.add_argument('-q', '--quiet', action='store_true',
                     help='quiet mode: only display number of errors')
 parser.add_argument('-v', '--version', action='version', version=VERSION)
@@ -324,18 +335,25 @@ for filename in args.file:
     po = PoFile(filename, args)
     if not args.compile or po.compile() == 0:
         po.read()
-        errors = po.check()
-        if errors == 0:
-            messages.append('%s: OK' % po.filename)
+        if args.extract:
+            po.display_translations()
         else:
-            messages.append('%s: %d errors (%s)' % (po.filename, errors,
-                                                    'almost good!' if errors <= 10 else 'uh oh... try again!'))
+            errors = po.check()
+            if errors == 0:
+                messages.append('%s: OK' % po.filename)
+            else:
+                messages.append('%s: %d errors (%s)' % (po.filename, errors,
+                                                        'almost good!' if errors <= 10 else 'uh oh... try again!'))
     else:
         print('%s: compilation FAILED' % po.filename)
         errors = 1
     if errors > 0:
         files_with_errors += 1
     errors_total += errors
+
+# exit now if we extracted translations
+if args.extract:
+    sys.exit(0)
 
 # display files with number of errors
 if errors > 0 and not args.quiet:

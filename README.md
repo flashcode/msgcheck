@@ -29,6 +29,8 @@ Options:
 * `-s`, `--spelling`: check spelling
 * `--pwl <file>`: file with personal word list used when checking spelling
 * `-w`, `--whitespace`: do not check whitespace at beginning/end of string
+* `--extract`: display all translations and exit (all checks except compilation
+  are disabled in this mode)
 * `-q`, `--quiet`: quiet mode: only display number of errors
 * `-v`, `--version`: display version and exit
 
