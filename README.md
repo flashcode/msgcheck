@@ -4,10 +4,11 @@
 (with extension ".po"):
 
 * check compilation (with command `msgfmt -c`)
-* for each translation:
-  * check number of lines in translated string
-  * check spaces at beginning/end of string
-  * check punctuation at end of string
+* for each translation, the script can check:
+  * number of lines in translated string
+  * whitespace at beginning/end of string
+  * punctuation at end of string
+  * spelling
 
 The script can run with either Python 2.x or 3.x.
 
