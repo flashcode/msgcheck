@@ -20,6 +20,8 @@
 # Perform some checks on gettext files (see README.md for more info).
 #
 
+enchant_found = False
+
 import argparse
 import os
 import re
@@ -27,8 +29,16 @@ import shlex
 import sys
 import subprocess
 
+# enchant module is optional, spelling is checked on demand
+try:
+    import enchant
+    from enchant.checker import SpellChecker
+    enchant_found = True
+except:
+    pass
+
 NAME = 'msgcheck.py'
-VERSION = '1.4'
+VERSION = '1.5'
 AUTHOR = 'Sebastien Helleu <flashcode@flashtux.org>'
 
 
@@ -71,10 +81,14 @@ class PoMessage:
     def error(self, message, mid, mstr):
         """Display an error found in gettext file (on stderr)."""
         print('=' * 70)
-        print('%s: line %d: %s%s:' % (self.filename, self.line, '(fuzzy) ' if self.fuzzy else '', message))
-        print('---')
-        for line in mid.split('\n'):
-            print('%s' % line)
+        if type(message) is not list:
+            message = [message]
+        for msg in message:
+            print('%s:%d: %s%s' % (self.filename, self.line, '(fuzzy) ' if self.fuzzy else '', msg))
+        if mid:
+            print('---')
+            for line in mid.split('\n'):
+                print('%s' % line)
         print('---')
         for line in mstr.split('\n'):
             print('%s' % line)
@@ -148,13 +162,34 @@ class PoMessage:
                 errors += 1
         return errors
 
+    def check_spelling(self, quiet, checker):
+        """Check spelling. Return the number of errors detected."""
+        if not checker:
+            return 0
+        errors = 0
+        for mid, mstr in self.messages:
+            if not mid or not mstr:
+                continue
+            # check spelling
+            checker.set_text(mstr)
+            misspelled = []
+            for err in checker:
+                misspelled.append('spelling: "%s"' % err.word)
+            if misspelled:
+                if not quiet:
+                    self.error(misspelled, None, mstr)
+                errors += len(misspelled)
+        return errors
+
 
 class PoFile:
 
-    def __init__(self, filename):
+    def __init__(self, filename, args):
         self.filename = os.path.abspath(filename)
+        self.args = args
         self.props = {'language': '', 'charset': 'utf-8'}
         self.msgs = []
+        self.checker = None
 
     def add_message(self, filename, numline_msgid, msgfuzzy, msg):
         """Add a message from PO file in list of messages."""
@@ -163,6 +198,14 @@ class PoFile:
             m = re.search(r'language: ([a-zA-Z-_]+)', msg.get('msgstr', ''), re.IGNORECASE)
             if m:
                 self.props['language'] = m.group(1)
+                if self.args.spelling:
+                    try:
+                        d = enchant.DictWithPWL(self.props['language'], args.pwl[0] if args.pwl else None)
+                        self.checker = SpellChecker(d)
+                    except:
+                        print('%s:%d: enchant dictionary not found for language "%s"'
+                              % (self.filename, numline_msgid, self.props['language']))
+                        self.checker = None
             m = re.search(r'charset=([a-zA-Z0-9-_]+)', msg.get('msgstr', ''), re.IGNORECASE)
             if m:
                 self.props['charset'] = m.group(1)
@@ -211,20 +254,22 @@ class PoFile:
         """Compile PO file and return the return code."""
         return subprocess.call(['msgfmt', '-c', '-o', '/dev/null', self.filename])
 
-    def check(self, args):
+    def check(self):
         """Check translations in PO file. Return the number of errors detected."""
         if not self.msgs:
             return 0
         errors = 0
         for msg in self.msgs:
-            if msg.fuzzy and not args.fuzzy:
+            if msg.fuzzy and not self.args.fuzzy:
                 continue
-            if args.lines:
-                errors += msg.check_lines_number(args.quiet)
-            if args.punct:
-                errors += msg.check_punctuation(args.quiet)
-            if args.whitespace:
-                errors += msg.check_whitespace(args.quiet)
+            if self.args.lines:
+                errors += msg.check_lines_number(self.args.quiet)
+            if self.args.punct:
+                errors += msg.check_punctuation(self.args.quiet)
+            if self.args.whitespace:
+                errors += msg.check_whitespace(self.args.quiet)
+            if self.args.spelling:
+                errors += msg.check_spelling(self.args.quiet, self.checker)
         return errors
 
 # parse command line arguments
@@ -235,22 +280,24 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
 Perform some checks on gettext files.
 ''' % (NAME, VERSION, AUTHOR),
                                  epilog='''
-Environment variable 'MSGCHECK_OPTIONS' can be set with options, its value is
-used before command line arguments (therefore arguments given on command line
-have higher priority).
+Environment variable 'MSGCHECK_OPTIONS' can be set with some default options.
 
 Return value:
   0: all files checked are OK (0 errors)
   n: number of files with errors (n >= 1)
 ''')
-parser.add_argument('-f', '--fuzzy', action='store_true',
-                    help='check fuzzy strings (they are ignored by default)')
 parser.add_argument('-c', '--compile', action='store_false',
                     help='do not check compilation of file (with `msgfmt -c`)')
+parser.add_argument('-f', '--fuzzy', action='store_true',
+                    help='check fuzzy strings (default: ignored)')
 parser.add_argument('-l', '--lines', action='store_false',
                     help='do not check number of lines')
 parser.add_argument('-p', '--punct', action='store_false',
                     help='do not check punctuation at end of string')
+parser.add_argument('-s', '--spelling', action='store_true',
+                    help='check spelling')
+parser.add_argument('--pwl', nargs=1,
+                    help='file with personal word list used when checking spelling')
 parser.add_argument('-w', '--whitespace', action='store_false',
                     help='do not check whitespace at beginning/end of string')
 parser.add_argument('-q', '--quiet', action='store_true',
@@ -262,16 +309,22 @@ if len(sys.argv) == 1:
     sys.exit(1)
 args = parser.parse_args(shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:])
 
+# exit now with error if spelling was asked but python enchant module was not found
+if args.spelling and not enchant_found:
+    print('Error: "enchant" module was not found to check spelling')
+    print('Please install python-enchant.')
+    sys.exit(1)
+
 # check files
 errors_total = 0
 files_with_errors = 0
 messages = []
 for filename in args.file:
     errors = 0
-    po = PoFile(filename)
+    po = PoFile(filename, args)
     if not args.compile or po.compile() == 0:
         po.read()
-        errors = po.check(args)
+        errors = po.check()
         if errors == 0:
             messages.append('%s: OK' % po.filename)
         else:
