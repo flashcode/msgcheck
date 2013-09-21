@@ -38,7 +38,7 @@ except:
     pass
 
 NAME = 'msgcheck.py'
-VERSION = '1.7'
+VERSION = '1.8'
 AUTHOR = 'Sebastien Helleu <flashcode@flashtux.org>'
 
 
@@ -162,19 +162,25 @@ class PoMessage:
                 errors += 1
         return errors
 
-    def check_spelling(self, quiet, checker, onlymisspelled):
+    def check_spelling(self, quiet, checkers, onlymisspelled):
         """Check spelling. Return the number of errors detected."""
-        if not checker:
+        if not checkers:
             return 0
         errors = 0
         for mid, mstr in self.messages:
             if not mid or not mstr:
                 continue
             # check spelling
-            checker.set_text(mstr)
+            checkers[0].set_text(mstr)
             misspelled = []
-            for err in checker:
-                misspelled.append(err.word)
+            for err in checkers[0]:
+                wrong = True
+                for d in checkers[1:]:
+                    if d.check(err.word):
+                        wrong = False
+                        break
+                if wrong:
+                    misspelled.append(err.word)
             if misspelled:
                 if not quiet:
                     if onlymisspelled:
@@ -192,7 +198,7 @@ class PoFile:
         self.args = args
         self.props = {'language': '', 'charset': 'utf-8'}
         self.msgs = []
-        self.checker = None
+        self.checkers = []
 
     def add_message(self, filename, numline_msgid, msgfuzzy, msg):
         """Add a message from PO file in list of messages."""
@@ -204,11 +210,19 @@ class PoFile:
                 if self.args.spelling:
                     try:
                         d = enchant.DictWithPWL(self.props['language'], args.pwl[0] if args.pwl else None)
-                        self.checker = SpellChecker(d)
+                        self.checkers.append(SpellChecker(d))
                     except:
                         print('%s:%d: enchant dictionary not found for language "%s"'
                               % (self.filename, numline_msgid, self.props['language']))
-                        self.checker = None
+                        self.checkers = []
+                    if self.args.dicts:
+                        for lang in self.args.dicts[0].split(','):
+                            try:
+                                d = enchant.Dict(lang)
+                                self.checkers.append(SpellChecker(d))
+                            except:
+                                print('%s: enchant dictionary not found for language "%s"'
+                                      % (self.filename, lang))
             m = re.search(r'charset=([a-zA-Z0-9-_]+)', msg.get('msgstr', ''), re.IGNORECASE)
             if m:
                 self.props['charset'] = m.group(1)
@@ -281,7 +295,7 @@ class PoFile:
             if self.args.whitespace:
                 errors += msg.check_whitespace(self.args.quiet)
             if self.args.spelling:
-                errors += msg.check_spelling(self.args.quiet, self.checker, self.args.onlymisspelled)
+                errors += msg.check_spelling(self.args.quiet, self.checkers, self.args.onlymisspelled)
         return errors
 
 # parse command line arguments
@@ -308,6 +322,8 @@ parser.add_argument('-p', '--punct', action='store_false',
                     help='do not check punctuation at end of string')
 parser.add_argument('-s', '--spelling', action='store_true',
                     help='check spelling')
+parser.add_argument('-d', '--dicts', nargs=1,
+                    help='comma-separated list of extra dictionaries to use (in addition to file language)')
 parser.add_argument('--pwl', nargs=1,
                     help='file with personal word list used when checking spelling')
 parser.add_argument('--onlymisspelled', action='store_true',
