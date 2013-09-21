@@ -28,8 +28,8 @@ Options:
 * `-l`, `--lines`: do not check number of lines
 * `-p`, `--punct`: do not check punctuation at end of string
 * `-s`, `--spelling`: check spelling
-* `-d`, `--dicts`: comma-separated list of extra dictionaries to use
-  (in addition to file language)
+* `-d` <dicts>, `--dicts` <dicts>: comma-separated list of extra dictionaries
+  to use (in addition to file language)
 * `--pwl <file>`: file with personal word list used when checking spelling
 * `-m`, `--onlymisspelled`: display only misspelled words (no error, line number
   and translation)
