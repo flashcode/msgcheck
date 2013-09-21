@@ -29,6 +29,8 @@ Options:
 * `-p`, `--punct`: do not check punctuation at end of string
 * `-s`, `--spelling`: check spelling
 * `--pwl <file>`: file with personal word list used when checking spelling
+* `--onlymisspelled`: display only misspelled words (no error, line number and
+  translation)
 * `-w`, `--whitespace`: do not check whitespace at beginning/end of string
 * `--extract`: display all translations and exit (all checks except compilation
   are disabled in this mode)
