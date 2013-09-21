@@ -162,7 +162,7 @@ class PoMessage:
                 errors += 1
         return errors
 
-    def check_spelling(self, quiet, checker):
+    def check_spelling(self, quiet, checker, onlymisspelled):
         """Check spelling. Return the number of errors detected."""
         if not checker:
             return 0
@@ -174,10 +174,13 @@ class PoMessage:
             checker.set_text(mstr)
             misspelled = []
             for err in checker:
-                misspelled.append('spelling: "%s"' % err.word)
+                misspelled.append(err.word)
             if misspelled:
                 if not quiet:
-                    self.error(misspelled, None, mstr)
+                    if onlymisspelled:
+                        print('\n'.join(misspelled))
+                    else:
+                        self.error(['spelling: "%s"' % word for word in misspelled], None, mstr)
                 errors += len(misspelled)
         return errors
 
@@ -278,7 +281,7 @@ class PoFile:
             if self.args.whitespace:
                 errors += msg.check_whitespace(self.args.quiet)
             if self.args.spelling:
-                errors += msg.check_spelling(self.args.quiet, self.checker)
+                errors += msg.check_spelling(self.args.quiet, self.checker, self.args.onlymisspelled)
         return errors
 
 # parse command line arguments
@@ -307,6 +310,8 @@ parser.add_argument('-s', '--spelling', action='store_true',
                     help='check spelling')
 parser.add_argument('--pwl', nargs=1,
                     help='file with personal word list used when checking spelling')
+parser.add_argument('--onlymisspelled', action='store_true',
+                    help='display only misspelled words (no error, line number and translation)')
 parser.add_argument('-w', '--whitespace', action='store_false',
                     help='do not check whitespace at beginning/end of string')
 parser.add_argument('--extract', action='store_true',
@@ -351,8 +356,8 @@ for filename in args.file:
         files_with_errors += 1
     errors_total += errors
 
-# exit now if we extracted translations
-if args.extract:
+# exit now if we extracted translations or if we displayed only misspelled words
+if args.extract or args.onlymisspelled:
     sys.exit(0)
 
 # display files with number of errors
