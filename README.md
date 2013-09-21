@@ -31,8 +31,8 @@ Options:
 * `-d`, `--dicts`: comma-separated list of extra dictionaries to use
   (in addition to file language)
 * `--pwl <file>`: file with personal word list used when checking spelling
-* `--onlymisspelled`: display only misspelled words (no error, line number and
-  translation)
+* `-m`, `--onlymisspelled`: display only misspelled words (no error, line number
+  and translation)
 * `-w`, `--whitespace`: do not check whitespace at beginning/end of string
 * `--extract`: display all translations and exit (all checks except compilation
   are disabled in this mode)

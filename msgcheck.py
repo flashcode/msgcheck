@@ -38,7 +38,7 @@ except:
     pass
 
 NAME = 'msgcheck.py'
-VERSION = '1.8'
+VERSION = '1.9'
 AUTHOR = 'Sebastien Helleu <flashcode@flashtux.org>'
 
 
@@ -326,7 +326,7 @@ parser.add_argument('-d', '--dicts', nargs=1,
                     help='comma-separated list of extra dictionaries to use (in addition to file language)')
 parser.add_argument('--pwl', nargs=1,
                     help='file with personal word list used when checking spelling')
-parser.add_argument('--onlymisspelled', action='store_true',
+parser.add_argument('-m', '--onlymisspelled', action='store_true',
                     help='display only misspelled words (no error, line number and translation)')
 parser.add_argument('-w', '--whitespace', action='store_false',
                     help='do not check whitespace at beginning/end of string')
