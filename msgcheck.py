@@ -38,7 +38,7 @@ except:
     pass
 
 NAME = 'msgcheck.py'
-VERSION = '1.9'
+VERSION = '2.0'
 AUTHOR = 'Sebastien Helleu <flashcode@flashtux.org>'
 
 
@@ -386,7 +386,7 @@ for msg in messages:
 if len(args.file) > 1:
     print('---')
     if errors_total == 0:
-        print('TOTAL: all OK')
+        print('TOTAL: %d files OK' % len(args.file))
     else:
         print('TOTAL: %d files OK, %d files with %d errors' % (len(args.file) - files_with_errors,
                                                                files_with_errors, errors_total))
