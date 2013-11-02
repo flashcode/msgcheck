@@ -10,7 +10,7 @@
   * punctuation at end of string
   * spelling
 
-The script can run with either Python 2.x or 3.x.
+The script requires Python >= 2.7.
 
 Module `python-enchant` is required if spelling is checked (option `-s`).
 
@@ -23,23 +23,28 @@ Syntax:
 Options:
 
 * `-h`, `--help`: display help message and exit
-* `-c`, `--compile`: do not check compilation of file (with `msgfmt -c`)
-* `-f`, `--fuzzy`: check fuzzy strings (default: ignored)
-* `-l`, `--lines`: do not check number of lines
-* `-p`, `--punct`: do not check punctuation at end of string
+* `-c`, `--no-compile`: do not check compilation of file (with `msgfmt -c`)
+* `-f`, `--fuzzy`: check fuzzy strings
+* `-l`, `--no-lines`: do not check number of lines
+* `-p`, `--no-punct`: do not check punctuation at end of strings
 * `-s`, `--spelling`: check spelling
 * `-d <dicts>`, `--dicts <dicts>`: comma-separated list of extra dictionaries
   to use (in addition to file language)
-* `--pwl <file>`: file with personal word list used when checking spelling
-* `-m`, `--onlymisspelled`: display only misspelled words (no error, line number
-  and translation)
-* `-w`, `--whitespace`: do not check whitespace at beginning/end of string
-* `--extract`: display all translations and exit (all checks except compilation
-  are disabled in this mode)
+* `-P <file>`, `--pwl <file>`: file with personal word list used when checking
+  spelling
+* `-m`, `--only-misspelled`: display only misspelled words (no error, line
+  number and translation)
+* `-w`, `--no-whitespace`: do not check whitespace at beginning/end of strings
+* `-e`, `--extract`: display all translations and exit (all checks except
+  compilation are disabled in this mode)
 * `-q`, `--quiet`: quiet mode: only display number of errors
 * `-v`, `--version`: display version and exit
 
 Environment variable 'MSGCHECK_OPTIONS' can be set with some default options.
+
+The script returns following exit code:
+  0: all files checked are OK (0 errors) (or --extract given)
+  n: number of files with errors (n >= 1)
 
 ## Example
 
