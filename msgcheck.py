@@ -23,7 +23,7 @@
 from __future__ import print_function
 
 import argparse
-import codecs
+from codecs import escape_decode
 import os
 import re
 import shlex
@@ -41,7 +41,7 @@ try:
 except:
     pass
 
-VERSION = '2.1'
+VERSION = '2.2'
 
 
 class PoMessage:
@@ -75,10 +75,10 @@ class PoMessage:
         # unescape strings
         if sys.version_info < (3,):
             # python 2.x
-            msg = {k: codecs.escape_decode(v)[0] for k, v in msg.items()}
+            msg = {k: escape_decode(v)[0] for k, v in msg.items()}
         else:
             # python 3.x
-            msg = {k: codecs.escape_decode(v)[0]. decode(charset)
+            msg = {k: escape_decode(v)[0]. decode(charset)
                    for k, v in msg.items()}
         # build messages as a list of tuples: (string, translation)
         self.messages = []
@@ -381,7 +381,9 @@ class PoFile:
                 errors += self.check_spelling(msg)
         return errors
 
-if __name__ == "__main__":
+
+def main():
+    """Main function, entry point."""
     # parse command line arguments
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -491,3 +493,7 @@ The script returns:
 
     # exit
     sys.exit(files_with_errors)
+
+
+if __name__ == "__main__":
+    main()
