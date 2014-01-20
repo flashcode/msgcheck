@@ -41,7 +41,7 @@ try:
 except:
     pass
 
-VERSION = '2.2'
+VERSION = '2.3'
 
 
 class PoMessage:
@@ -123,7 +123,7 @@ class PoFile:
                 if self.args.spelling:
                     try:
                         d = enchant.DictWithPWL(self.props['language'],
-                                                args.pwl)
+                                                self.args.pwl)
                         self.checkers.append(SpellChecker(d))
                     except:
                         print(self.filename, ':', numline_msgid,
