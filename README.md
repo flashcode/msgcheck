@@ -5,9 +5,10 @@
 
 * check compilation (with command `msgfmt -c`)
 * for each translation, the script can check:
-  * number of lines in translated string
-  * whitespace at beginning/end of string
-  * punctuation at end of string
+  * number of lines in translated strings
+  * whitespace at beginning/end of strings
+  * trailing whitespace at end of lines inside strings
+  * punctuation at end of strings
   * spelling
 
 The script requires Python >= 2.7.
@@ -35,12 +36,14 @@ Options:
 * `-m`, `--only-misspelled`: display only misspelled words (no error, line
   number and translation)
 * `-w`, `--no-whitespace`: do not check whitespace at beginning/end of strings
+* `-W`, `--no-whitespace-eol`: do not check whitespace at end of lines inside
+  strings
 * `-e`, `--extract`: display all translations and exit (all checks except
   compilation are disabled in this mode)
 * `-q`, `--quiet`: quiet mode: only display number of errors
 * `-v`, `--version`: display version and exit
 
-Environment variable 'MSGCHECK_OPTIONS' can be set with some default options.
+Environment variable `MSGCHECK_OPTIONS` can be set with some default options.
 
 The script returns following exit code:
   0: all files checked are OK (0 errors) (or --extract given)
@@ -70,3 +73,20 @@ The script returns following exit code:
      valeur courante
     ======================================================================
     fr.po: 3 errors (almost good!)
+
+## Copyright
+
+Copyright (C) 2009-2014 Sébastien Helleu <flashcode@flashtux.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

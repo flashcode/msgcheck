@@ -41,7 +41,7 @@ try:
 except:
     pass
 
-VERSION = '2.3'
+VERSION = '2.4'
 
 
 class PoMessage:
@@ -328,6 +328,31 @@ class PoFile:
                 errors += 1
         return errors
 
+    def check_whitespace_eol(self, msg):
+        """
+        Check trailing whitespace at the end of lines in a string.
+        Return the number of errors detected.
+        """
+        errors = 0
+        for mid, mstr in msg.messages:
+            if not mid or not mstr:
+                continue
+            idlines = mid.split('\n')
+            strlines = mstr.split('\n')
+            if len(idlines) < 2 or len(idlines) != len(strlines):
+                continue
+            for i in range(0, len(idlines)):
+                endin = len(idlines[i]) - len(idlines[i].rstrip(' '))
+                endout = len(strlines[i]) - len(strlines[i].rstrip(' '))
+                if (endin > 0 or endout > 0) and endin != endout:
+                    self.error(msg, mid, mstr,
+                               'different whitespace at end of a line: {0} in '
+                               'string, {1} in translation'.format(endin,
+                                                                   endout))
+                    errors += 1
+                    break
+        return errors
+
     def check_spelling(self, msg):
         """
         Check spelling.
@@ -377,6 +402,8 @@ class PoFile:
                 errors += self.check_punctuation(msg)
             if not self.args.no_whitespace:
                 errors += self.check_whitespace(msg)
+            if not self.args.no_whitespace_eol:
+                errors += self.check_whitespace_eol(msg)
             if self.args.spelling:
                 errors += self.check_spelling(msg)
         return errors
@@ -419,6 +446,9 @@ The script returns:
     parser.add_argument('-w', '--no-whitespace', action='store_true',
                         help='do not check whitespace at beginning/end of '
                         'strings')
+    parser.add_argument('-W', '--no-whitespace-eol', action='store_true',
+                        help='do not check trailing whitespace at end of '
+                        'lines inside strings')
     parser.add_argument('-e', '--extract', action='store_true',
                         help='display all translations and exit '
                         '(all checks except compilation are disabled in this '
