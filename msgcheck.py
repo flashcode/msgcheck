@@ -44,6 +44,16 @@ except ImportError:
 VERSION = '2.5-dev'
 
 
+def count_lines(string):
+    """
+    Count number of lines in a string or translation.
+    """
+    count = len(string.split('\n'))
+    if count > 1 and string.endswith('\n'):
+        count -= 1
+    return count
+
+
 class PoMessage:
     """
     A message from a gettext file. It is stored as a list of tuples
@@ -234,15 +244,6 @@ class PoFile:
             print('---', mid, sep='\n')
         print('---', mstr, sep='\n')
 
-    def count_lines(self, s):
-        """
-        Count number of lines in a string or translation.
-        """
-        count = len(s.split('\n'))
-        if count > 1 and s.endswith('\n'):
-            count -= 1
-        return count
-
     def check_lines_number(self, msg):
         """
         Check number of lines in string and translation.
@@ -252,8 +253,8 @@ class PoFile:
         for mid, mstr in msg.messages:
             if not mid or not mstr:
                 continue
-            nb_id = self.count_lines(mid)
-            nb_str = self.count_lines(mstr)
+            nb_id = count_lines(mid)
+            nb_str = count_lines(mstr)
             if nb_id != nb_str:
                 self.error(msg, mid, mstr,
                            'number of lines: {0} in string, '
@@ -310,7 +311,7 @@ class PoFile:
             if not mid or not mstr:
                 continue
             # check whitespace at beginning of string
-            if self.count_lines(mid) == 1:
+            if count_lines(mid) == 1:
                 startin = len(mid) - len(mid.lstrip(' '))
                 startout = len(mstr) - len(mstr.lstrip(' '))
                 if startin != startout:
