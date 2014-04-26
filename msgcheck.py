@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#
-# Perform some checks on gettext files (see README.md for more info).
-#
+"""
+Perform some checks on gettext files (see README.md for more info).
+"""
 
 from __future__ import print_function
 
@@ -41,7 +41,7 @@ try:
 except:
     pass
 
-VERSION = '2.4'
+VERSION = '2.5-dev'
 
 
 class PoMessage:
