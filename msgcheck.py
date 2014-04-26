@@ -119,7 +119,7 @@ class PoFile(object):
         self.msgs = []
         self.checkers = []
 
-    def add_message(self, filename, numline_msgid, msgfuzzy, msg):
+    def add_message(self, numline_msgid, msgfuzzy, msg):
         """
         Add a message from PO file in list of messages.
         """
@@ -187,8 +187,7 @@ class PoFile(object):
                             line = m.group(3)
                             if msgcurrent == 'msgid':
                                 if oldmsgcurrent.startswith('msgstr'):
-                                    self.add_message(self.filename,
-                                                     numline_msgid,
+                                    self.add_message(numline_msgid,
                                                      msgfuzzy,
                                                      msg)
                                 msgfuzzy = fuzzy
@@ -198,8 +197,7 @@ class PoFile(object):
                     if msgcurrent and line.startswith('"'):
                         msg[msgcurrent] = msg.get(msgcurrent, '') + line[1:-1]
                 if msgcurrent.startswith('msgstr'):
-                    self.add_message(self.filename,
-                                     numline_msgid,
+                    self.add_message(numline_msgid,
                                      msgfuzzy,
                                      msg)
         except Exception:
