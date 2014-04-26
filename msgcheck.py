@@ -108,7 +108,7 @@ class PoMessage(object):
 
 class PoFile(object):
     """
-    A gettext file. It includes functions to read the file, and perform
+    A gettext file. It includes methods to read the file, and perform
     checks on the translations.
     """
 
