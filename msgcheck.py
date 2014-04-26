@@ -41,7 +41,7 @@ try:
 except ImportError:
     pass
 
-VERSION = '2.5-dev'
+VERSION = '2.5'
 
 
 def count_lines(string):
