@@ -35,10 +35,10 @@ import traceback
 # (argument -s/--spell)
 ENCHANT_FOUND = False
 try:
-    import enchant
+    from enchant import Dict, DictWithPWL, DictNotFoundError
     from enchant.checker import SpellChecker
     ENCHANT_FOUND = True
-except:
+except ImportError:
     pass
 
 VERSION = '2.5-dev'
