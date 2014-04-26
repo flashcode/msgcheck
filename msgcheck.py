@@ -54,7 +54,7 @@ def count_lines(string):
     return count
 
 
-class PoMessage:
+class PoMessage(object):
     """
     A message from a gettext file. It is stored as a list of tuples
     (string, translation).
@@ -106,7 +106,7 @@ class PoMessage:
         self.line = line
 
 
-class PoFile:
+class PoFile(object):
     """
     A gettext file. It includes functions to read the file, and perform
     checks on the translations.
