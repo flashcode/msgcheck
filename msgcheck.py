@@ -33,11 +33,11 @@ import traceback
 
 # enchant module is optional, spelling is checked on demand
 # (argument -s/--spell)
-enchant_found = False
+ENCHANT_FOUND = False
 try:
     import enchant
     from enchant.checker import SpellChecker
-    enchant_found = True
+    ENCHANT_FOUND = True
 except:
     pass
 
@@ -466,7 +466,7 @@ The script returns:
 
     # exit now with error if spelling was asked but python enchant module was
     # not found
-    if args.spelling and not enchant_found:
+    if args.spelling and not ENCHANT_FOUND:
         print('Error: "enchant" module was not found to check spelling')
         print('Please install python-enchant.')
         sys.exit(1)
