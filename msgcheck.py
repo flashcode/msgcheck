@@ -132,10 +132,10 @@ class PoFile(object):
                 self.props['language'] = match.group(1)
                 if self.args.spelling:
                     try:
-                        d = enchant.DictWithPWL(self.props['language'],
-                                                self.args.pwl)
-                        self.checkers.append(SpellChecker(d))
-                    except:
+                        _dict = DictWithPWL(self.props['language'],
+                                            self.args.pwl)
+                        self.checkers.append(SpellChecker(_dict))
+                    except DictNotFoundError:
                         print(self.filename, ':', numline_msgid,
                               ': enchant dictionary not found for language ',
                               self.props['language'],
@@ -144,9 +144,9 @@ class PoFile(object):
                     if self.args.dicts:
                         for lang in self.args.dicts.split(','):
                             try:
-                                d = enchant.Dict(lang)
-                                self.checkers.append(SpellChecker(d))
-                            except:
+                                _dict = Dict(lang)
+                                self.checkers.append(SpellChecker(_dict))
+                            except DictNotFoundError:
                                 print(self.filename,
                                       ': enchant dictionary not found for '
                                       'language ',
