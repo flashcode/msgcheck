@@ -126,10 +126,10 @@ class PoFile(object):
         if 'msgid' in msg and len(msg['msgid']) == 0:
             # find file language/charset in properties
             # (first string without msgid)
-            m = re.search(r'language: ([a-zA-Z-_]+)', msg.get('msgstr', ''),
-                          re.IGNORECASE)
-            if m:
-                self.props['language'] = m.group(1)
+            match = re.search(r'language: ([a-zA-Z-_]+)',
+                              msg.get('msgstr', ''), re.IGNORECASE)
+            if match:
+                self.props['language'] = match.group(1)
                 if self.args.spelling:
                     try:
                         d = enchant.DictWithPWL(self.props['language'],
@@ -152,10 +152,10 @@ class PoFile(object):
                                       'language ',
                                       lang,
                                       sep='')
-            m = re.search(r'charset=([a-zA-Z0-9-_]+)', msg.get('msgstr', ''),
-                          re.IGNORECASE)
-            if m:
-                self.props['charset'] = m.group(1)
+            match = re.search(r'charset=([a-zA-Z0-9-_]+)',
+                              msg.get('msgstr', ''), re.IGNORECASE)
+            if match:
+                self.props['charset'] = match.group(1)
         self.msgs.append(PoMessage(msg, self.props['charset'], msgfuzzy,
                                    numline_msgid,))
 
@@ -169,8 +169,8 @@ class PoFile(object):
         msg = {}
         msgcurrent = ''
         try:
-            with open(self.filename, 'r') as f:
-                for line in f.readlines():
+            with open(self.filename, 'r') as _file:
+                for line in _file.readlines():
                     numline += 1
                     line = line.strip()
                     if len(line) == 0:
@@ -179,12 +179,13 @@ class PoFile(object):
                         fuzzy = 'fuzzy' in line
                         continue
                     if line.startswith('msg'):
-                        m = re.match(r'([a-zA-Z0-9-_]+(\[\d+\])?)[ \t](.*)',
-                                     line)
-                        if m:
+                        match = re.match(
+                            r'([a-zA-Z0-9-_]+(\[\d+\])?)[ \t](.*)',
+                            line)
+                        if match:
                             oldmsgcurrent = msgcurrent
-                            msgcurrent = m.group(1)
-                            line = m.group(3)
+                            msgcurrent = match.group(1)
+                            line = match.group(3)
                             if msgcurrent == 'msgid':
                                 if oldmsgcurrent.startswith('msgstr'):
                                     self.add_message(numline_msgid,
@@ -368,8 +369,8 @@ class PoFile(object):
             misspelled = []
             for err in self.checkers[0]:
                 misspelled_word = True
-                for d in self.checkers[1:]:
-                    if d.check(err.word):
+                for spell_checker in self.checkers[1:]:
+                    if spell_checker.check(err.word):
                         misspelled_word = False
                         break
                 if misspelled_word:
@@ -476,23 +477,23 @@ The script returns:
     messages = []
     for filename in args.file:
         errors = 0
-        po = PoFile(filename, args)
-        if args.no_compile or po.compile() == 0:
-            po.read()
+        po_file = PoFile(filename, args)
+        if args.no_compile or po_file.compile() == 0:
+            po_file.read()
             if args.extract:
-                po.display_translations()
+                po_file.display_translations()
             else:
-                errors = po.check()
+                errors = po_file.check()
                 if errors == 0:
-                    messages.append('{0}: OK'.format(po.filename))
+                    messages.append('{0}: OK'.format(po_file.filename))
                 else:
                     messages.append('{0}: {1} errors ({2})'
-                                    ''.format(po.filename,
+                                    ''.format(po_file.filename,
                                               errors,
                                               'almost good!' if errors <= 10
                                               else 'uh oh... try again!'))
         else:
-            print(po.filename, ': compilation FAILED', sep='')
+            print(po_file.filename, ': compilation FAILED', sep='')
             errors = 1
         if errors > 0:
             files_with_errors += 1
