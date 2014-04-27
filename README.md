@@ -3,8 +3,8 @@
 `msgcheck.py` is a Python script used to perform some checks on gettext files
 (with extension ".po"):
 
-* check compilation (with command `msgfmt -c`)
-* for each translation, the script can check:
+* compilation (with command `msgfmt -c`)
+* for each translation:
   * number of lines in translated strings
   * whitespace at beginning/end of strings
   * trailing whitespace at end of lines inside strings

@@ -17,7 +17,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Perform some checks on gettext files (see README.md for more info).
+Perform some checks on gettext files.
+
+The checks performed:
+* compilation (with command `msgfmt -c`)
+* for each translation:
+  * number of lines in translated strings
+  * whitespace at beginning/end of strings
+  * trailing whitespace at end of lines inside strings
+  * punctuation at end of strings
+  * spelling
 """
 
 from __future__ import print_function
@@ -41,12 +50,12 @@ try:
 except ImportError:
     pass
 
-VERSION = '2.5'
+VERSION = '2.6-dev'
 
 
 def count_lines(string):
     """
-    Count number of lines in a string or translation.
+    Count the number of lines in a string or translation.
     """
     count = len(string.split('\n'))
     if count > 1 and string.endswith('\n'):
