@@ -431,7 +431,7 @@ Argument "@file.txt" can be used to read default options in a file.
 
 The script returns:
   0: all files checked are OK (or --extract/--only-misspelled given)
-  n: number of files with errors (n >= 1)
+  n: number of files with errors (1 <= n <= 255)
 ''')
     parser.add_argument('-c', '--no-compile', action='store_true',
                         help='do not check compilation of file')
@@ -531,7 +531,7 @@ The script returns:
                             errors_total))
 
     # exit
-    sys.exit(files_with_errors)
+    sys.exit(files_with_errors if files_with_errors <= 255 else 255)
 
 
 if __name__ == "__main__":
