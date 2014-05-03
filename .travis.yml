@@ -11,6 +11,6 @@ before_install:
   - sudo apt-get install -y aspell aspell-fr libenchant-dev
 
 install:
-  - "pip install -r requirements.txt"
-  - "[ $(find $HOME/.pip/pip.log 2>/dev/null) ] && cat $HOME/.pip/pip.log"
+  - "pip install -r requirements.txt;[ $(find $HOME/.pip/pip.log 2>/dev/null) ] && cat /home/travis/.pip/pip.log"
+
 script: nosetests
