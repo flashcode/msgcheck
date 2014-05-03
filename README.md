@@ -1,7 +1,6 @@
 ## Description
 
-`msgcheck.py` is a Python script used to perform some checks on gettext files
-(with extension ".po"):
+`msgcheck` performs various checks on gettext files (with extension ".po"):
 
 * compilation (with command `msgfmt -c`)
 * for each translation:
@@ -13,13 +12,13 @@
 
 The script requires Python >= 2.7.
 
-Module `python-enchant` is required if spelling is checked (option `-s`).
+Module `pyenchant` is required if spelling is checked (option `-s`).
 
 ## Usage
 
 Syntax:
 
-    $ python msgcheck.py [options] file.po [file.po...]
+    $ msgcheck [options] file.po [file.po...]
 
 Options:
 
@@ -51,28 +50,28 @@ The script returns following exit code:
 
 ## Example
 
-    $ python msgcheck.py fr.po
+    $ msgcheck fr.po
     ======================================================================
-    /path/to/fr.po:242: end punctuation: ":" in translation, ":" not in string:
+    /path/to/fr.po:242: [punct] end punctuation: ":" in translation, ":" not in string:
     ---
     error
     ---
     erreur:
     ======================================================================
-    /path/to/fr.po:262: number of lines: 1 in string, 2 in translation:
+    /path/to/fr.po:262: [lines] number of lines: 1 in string, 2 in translation:
     ---
     Message filters:
     ---
     Filtres de
     messages:
     ======================================================================
-    /path/to/fr.po:336: spaces at beginning: 0 in string, 1 in translation:
+    /path/to/fr.po:336: [whitespace] spaces at beginning: 0 in string, 1 in translation:
     ---
     current value
     ---
      valeur courante
     ======================================================================
-    fr.po: 3 errors (almost good!)
+    /path/to/fr.po: 3 errors (almost good!)
 
 ## Copyright
 
