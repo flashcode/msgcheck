@@ -14,6 +14,16 @@ The script requires Python >= 2.7.
 
 Module `pyenchant` is required if spelling is checked (option `-s`).
 
+## Install
+
+Install a released version from the Python package index with pip:
+
+    $ pip install msgcheck
+
+Install via source distribution:
+
+    $ python setup.py install
+
 ## Usage
 
 Syntax:
