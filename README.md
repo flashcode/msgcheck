@@ -24,7 +24,7 @@ Install via source distribution:
 
     $ python setup.py install
 
-image:https://travis-ci.org/flashcode/msgcheck.svg?branch=master["Build Status", link="https://travis-ci.org/flashcode/msgcheck"]
+[![Build Status](https://travis-ci.org/flashcode/msgcheck.svg?branch=master)](https://travis-ci.org/flashcode/msgcheck)
 
 ## Usage
 
