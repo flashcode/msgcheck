@@ -409,7 +409,7 @@ class PoCheck(object):
         self.pwl = pwl
 
         # check if pwl file exists
-        if not os.path.isfile(pwl):
+        if pwl and not os.path.isfile(pwl):
             raise IOError('pwl file "{0}" not found'.format(pwl))
 
         # build extra checkers with dicts
