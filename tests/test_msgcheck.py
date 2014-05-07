@@ -28,8 +28,8 @@ import unittest
 from msgcheck.po import PoFile, PoCheck
 
 
-def po_path(filename):
-    """Return path to a text gettext file."""
+def local_path(filename):
+    """Return path to a file in the "tests" directory."""
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 
@@ -40,22 +40,22 @@ class TestMsgCheck(unittest.TestCase):
     def test_compilation(self):
         """Test compilation of gettext files."""
         # valid file
-        self.assertEquals(PoFile(po_path('fr.po')).compile()[1], 0)
+        self.assertEquals(PoFile(local_path('fr.po')).compile()[1], 0)
 
         # invalid file
-        self.assertEquals(PoFile(po_path('fr_compile.po')).compile()[1], 1)
+        self.assertEquals(PoFile(local_path('fr_compile.po')).compile()[1], 1)
 
     def test_read(self):
         """Test read of gettext files."""
         # valid file
         try:
-            PoFile(po_path('fr.po')).read()
+            PoFile(local_path('fr.po')).read()
         except IOError:
             self.fail('Read error on a valid file.')
 
         # non-existing file
         try:
-            PoFile(po_path('fr_does_not_exist.po')).read()
+            PoFile(local_path('fr_does_not_exist.po')).read()
         except IOError:
             pass  # this exception is expected
         else:
@@ -64,8 +64,8 @@ class TestMsgCheck(unittest.TestCase):
     def test_checks(self):
         """Test checks on gettext files."""
         po_check = PoCheck()
-        result = po_check.check_files([po_path('fr.po'),
-                                       po_path('fr_errors.po')])
+        result = po_check.check_files([local_path('fr.po'),
+                                       local_path('fr_errors.po')])
 
         # be sure we have 2 files in result
         self.assertEquals(len(result), 2)
@@ -87,7 +87,7 @@ class TestMsgCheck(unittest.TestCase):
         """Test checks on a gettext file including fuzzy strings."""
         po_check = PoCheck()
         po_check.set_check('fuzzy', True)
-        result = po_check.check_files([po_path('fr_errors.po')])
+        result = po_check.check_files([local_path('fr_errors.po')])
 
         # be sure we have one file in result
         self.assertEquals(len(result), 1)
@@ -99,8 +99,9 @@ class TestMsgCheck(unittest.TestCase):
         """Test spelling on gettext files."""
         po_check = PoCheck()
         po_check.set_check('spelling', True)
-        result = po_check.check_files([po_path('fr_spelling.po'),
-                                       po_path('fr_language.po')])
+        po_check.set_spelling_options(None, local_path('pwl.txt'))
+        result = po_check.check_files([local_path('fr_spelling.po'),
+                                       local_path('fr_language.po')])
 
         # be sure we have 2 files in result
         self.assertEquals(len(result), 2)
@@ -117,9 +118,6 @@ class TestMsgCheck(unittest.TestCase):
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors[0].idmsg, 'dict')
 
-    def test_spelling_pwl(self):
-        """Test spelling on a gettext file with pwl option."""
-
     def test_spelling_bad_dict(self):
         """Test spelling with a bad dict option."""
         po_check = PoCheck()
@@ -130,16 +128,14 @@ class TestMsgCheck(unittest.TestCase):
         """Test spelling with a bad pwl option."""
         po_check = PoCheck()
         po_check.set_check('spelling', True)
-        po_check.set_spelling_options(None, '/this/file/does/not/exist')
-        result = po_check.check_files([po_path('fr_spelling.po')])
+        try:
+            po_check.set_spelling_options(None,
+                                          local_path('pwl_does_not_exist.txt'))
+        except IOError:
+            pass  # this exception is expected
+        else:
+            self.fail('No problem when using a non-existing pwl file!')
 
-        # be sure we have one file in result
-        self.assertEquals(len(result), 1)
-
-        # one error expected: pwl file not found
-        errors = result[0][1]
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(errors[0].idmsg, 'pwl')
 
 if __name__ == "__main__":
     unittest.main()
