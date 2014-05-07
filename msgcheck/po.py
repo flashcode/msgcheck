@@ -408,6 +408,10 @@ class PoCheck(object):
         self.dicts = dicts
         self.pwl = pwl
 
+        # check if pwl file exists
+        if not os.path.isfile(pwl):
+            raise IOError('pwl file "{0}" not found'.format(pwl))
+
         # build extra checkers with dicts
         self.extra_checkers = []
         if dicts:

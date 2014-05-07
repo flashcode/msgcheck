@@ -123,7 +123,7 @@ def main():
     try:
         po_check.set_spelling_options(args.dicts, args.pwl)
         result = po_check.check_files(args.file)
-    except ImportError as exc:
+    except (ImportError, IOError) as exc:
         print('FATAL:', exc, sep=' ')
         sys.exit(1)
 
