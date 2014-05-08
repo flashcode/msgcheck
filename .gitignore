@@ -1,2 +1,5 @@
 *.pyc
 *.pyo
+dist/
+msgcheck.egg-info/
+nose-*.egg/
