@@ -14,6 +14,8 @@ The script requires Python >= 2.7.
 
 Module `pyenchant` is required if spelling is checked (option `-s`).
 
+[![Build Status](https://travis-ci.org/flashcode/msgcheck.svg?branch=master)](https://travis-ci.org/flashcode/msgcheck)
+
 ## Install
 
 Install a released version from the Python package index with pip:
@@ -23,8 +25,6 @@ Install a released version from the Python package index with pip:
 Install via source distribution:
 
     $ python setup.py install
-
-[![Build Status](https://travis-ci.org/flashcode/msgcheck.svg?branch=master)](https://travis-ci.org/flashcode/msgcheck)
 
 ## Usage
 
