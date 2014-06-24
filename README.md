@@ -39,7 +39,8 @@ Options:
 * `-f`, `--fuzzy`: check fuzzy strings
 * `-l`, `--no-lines`: do not check number of lines
 * `-p`, `--no-punct`: do not check punctuation at end of strings
-* `-s`, `--spelling`: check spelling
+* `-s id|str`, `--spelling id|str`: check spelling (`id` = source messages,
+  `str` = translations)
 * `-d <dicts>`, `--dicts <dicts>`: comma-separated list of extra dictionaries
   to use (in addition to file language)
 * `-P <file>`, `--pwl <file>`: file with personal word list used when checking

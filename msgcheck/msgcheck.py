@@ -26,7 +26,7 @@ Perform various checks on gettext files:
   * whitespace at beginning/end of strings
   * trailing whitespace at end of lines inside strings
   * punctuation at end of strings
-  * spelling
+  * spelling (messages and translations)
 """
 
 from __future__ import print_function
@@ -69,7 +69,7 @@ The script returns:
                         help='do not check number of lines')
     parser.add_argument('-p', '--no-punct', action='store_true',
                         help='do not check punctuation at end of strings')
-    parser.add_argument('-s', '--spelling', action='store_true',
+    parser.add_argument('-s', '--spelling', choices=['id', 'str'],
                         help='check spelling')
     parser.add_argument('-d', '--dicts',
                         help='comma-separated list of extra dictionaries '
@@ -110,18 +110,17 @@ def main():
     args = parser.parse_args(
         shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:])
 
-    # create checker and set options
+    # create checker and set boolean options
     po_check = PoCheck()
     for option in ('no_compile', 'fuzzy', 'no_lines', 'no_punct',
-                   'no_whitespace', 'no_whitespace_eol', 'spelling',
-                   'extract'):
+                   'no_whitespace', 'no_whitespace_eol', 'extract'):
         if args.__dict__[option]:
             po_check.set_check(option.lstrip('no_'),
                                not option.startswith('no_'))
 
     # check all files
     try:
-        po_check.set_spelling_options(args.dicts, args.pwl)
+        po_check.set_spelling_options(args.spelling, args.dicts, args.pwl)
         result = po_check.check_files(args.file)
     except (ImportError, IOError) as exc:
         print('FATAL:', exc, sep=' ')
@@ -136,7 +135,7 @@ def main():
             if not args.quiet:
                 if args.only_misspelled:
                     print('\n'.join([report.message for report in reports
-                                     if report.idmsg == 'spelling']))
+                                     if report.idmsg.startswith('spelling-')]))
                 else:
                     print('\n'.join([str(report) for report in reports]))
         else:

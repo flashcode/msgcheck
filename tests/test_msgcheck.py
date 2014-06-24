@@ -98,8 +98,7 @@ class TestMsgCheck(unittest.TestCase):
     def test_spelling(self):
         """Test spelling on gettext files."""
         po_check = PoCheck()
-        po_check.set_check('spelling', True)
-        po_check.set_spelling_options(None, local_path('pwl.txt'))
+        po_check.set_spelling_options('str', None, local_path('pwl.txt'))
         result = po_check.check_files([local_path('fr_spelling.po'),
                                        local_path('fr_language.po')])
 
@@ -110,7 +109,7 @@ class TestMsgCheck(unittest.TestCase):
         errors = result[0][1]
         self.assertEquals(len(errors), 2)
         for i, word in enumerate(('aabbcc', 'xxyyzz')):
-            self.assertEquals(errors[i].idmsg, 'spelling')
+            self.assertEquals(errors[i].idmsg, 'spelling-str')
             self.assertEquals(errors[i].message, word)
 
         # second file has 1 error: dict/language "xyz" not found
@@ -121,15 +120,14 @@ class TestMsgCheck(unittest.TestCase):
     def test_spelling_bad_dict(self):
         """Test spelling with a bad dict option."""
         po_check = PoCheck()
-        po_check.set_spelling_options('xxx', None)
+        po_check.set_spelling_options('str', 'xxx', None)
         self.assertEquals(len(po_check.extra_checkers), 0)
 
     def test_spelling_bad_pwl(self):
         """Test spelling with a bad pwl option."""
         po_check = PoCheck()
-        po_check.set_check('spelling', True)
         try:
-            po_check.set_spelling_options(None,
+            po_check.set_spelling_options('str', None,
                                           local_path('pwl_does_not_exist.txt'))
         except IOError:
             pass  # this exception is expected

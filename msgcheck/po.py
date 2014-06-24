@@ -253,7 +253,7 @@ class PoMessage(object):
                     break
         return errors
 
-    def check_spelling(self, checkers):
+    def check_spelling(self, spelling, checkers):
         """
         Check spelling.
         Return a list with errors detected.
@@ -264,7 +264,7 @@ class PoMessage(object):
         for mid, mstr in self.messages:
             if not mid or not mstr:
                 continue
-            checkers[0].set_text(mstr)
+            checkers[0].set_text(mstr if spelling == 'str' else mid)
             misspelled = []
             for err in checkers[0]:
                 misspelled_word = True
@@ -275,8 +275,8 @@ class PoMessage(object):
                 if misspelled_word:
                     misspelled.append(err.word)
             for word in misspelled:
-                errors.append(PoReport(word, 'spelling', self.filename,
-                                       self.line, mid, mstr))
+                errors.append(PoReport(word, 'spelling-' + spelling,
+                                       self.filename, self.line, mid, mstr))
         return errors
 
 
@@ -383,11 +383,11 @@ class PoCheck(object):
             'punct': True,
             'whitespace': True,
             'whitespace_eol': True,
-            'spelling': False,
             'extract': False,
         }
 
         # spelling options
+        self.spelling = None
         self.dicts = None
         self.extra_checkers = []
         self.pwl = None
@@ -403,8 +403,9 @@ class PoCheck(object):
         if check in self.checks:
             self.checks[check] = bool(state)
 
-    def set_spelling_options(self, dicts, pwl):
+    def set_spelling_options(self, spelling, dicts, pwl):
         """Set spelling options."""
+        self.spelling = spelling
         self.dicts = dicts
         self.pwl = pwl
 
@@ -429,17 +430,19 @@ class PoCheck(object):
     def _get_language_checker(self, po_file, reports):
         """Get checker for PO file language."""
         checker = []
-        if self.checks['spelling']:
+        if self.spelling:
             if not ENCHANT_FOUND:
                 raise ImportError('Enchant module not found (please install '
                                   '"pyenchant")')
+            lang = po_file.props['language'] \
+                if self.spelling == 'str' else 'en'
             try:
-                _dict = DictWithPWL(po_file.props['language'], self.pwl)
+                _dict = DictWithPWL(lang, self.pwl)
                 checker.append(SpellChecker(_dict))
             except DictNotFoundError:
                 reports.append(PoReport(
                     'enchant dictionary not found for language "{0}"'
-                    ''.format(po_file.props['language']),
+                    ''.format(lang),
                     'dict', po_file.filename,
                     po_file.props['language_numline']))
                 checker = []
@@ -479,9 +482,9 @@ class PoCheck(object):
                     reports += msg.check_whitespace()
                 if self.checks['whitespace_eol']:
                     reports += msg.check_whitespace_eol()
-                if self.checks['spelling']:
+                if self.spelling:
                     reports += msg.check_spelling(
-                        checker + self.extra_checkers)
+                        self.spelling, checker + self.extra_checkers)
 
         return reports
 
