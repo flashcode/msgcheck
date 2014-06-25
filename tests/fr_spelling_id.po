@@ -18,7 +18,7 @@
 #
 
 #
-# Gettext file with 2 spelling errors (in French).
+# Gettext file with 2 spelling errors (in English source messages).
 #
 
 msgid ""
@@ -35,17 +35,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "This is a test.\n"
+msgid "Thsi is a test.\n"
 msgstr "Ceci est un test.\n"
 
 msgid "Test 1"
-msgstr "aabbcc"
+msgstr "Test 1"
 
 msgid "Test 2"
-msgstr "xxyyzz"
+msgstr "Test 2"
 
 #, c-format
-msgid " error: %s"
+msgid " errro: %s"
 msgstr " erreur : %s"
 
 #~ msgid "Obsolete message"

@@ -95,11 +95,27 @@ class TestMsgCheck(unittest.TestCase):
         # the file has 11 errors (with the fuzzy string)
         self.assertEquals(len(result[0][1]), 11)
 
-    def test_spelling(self):
-        """Test spelling on gettext files."""
+    def test_spelling_id(self):
+        """Test spelling on source messages (English) of gettext files."""
+        po_check = PoCheck()
+        po_check.set_spelling_options('id', None, local_path('pwl.txt'))
+        result = po_check.check_files([local_path('fr_spelling_id.po')])
+
+        # be sure we have 1 file in result
+        self.assertEquals(len(result), 1)
+
+        # the file has 2 spelling errors: words "Thsi" and "errro"
+        errors = result[0][1]
+        self.assertEquals(len(errors), 2)
+        for i, word in enumerate(('Thsi', 'errro')):
+            self.assertEquals(errors[i].idmsg, 'spelling-id')
+            self.assertEquals(errors[i].message, word)
+
+    def test_spelling_str(self):
+        """Test spelling on translated messages of gettext files."""
         po_check = PoCheck()
         po_check.set_spelling_options('str', None, local_path('pwl.txt'))
-        result = po_check.check_files([local_path('fr_spelling.po'),
+        result = po_check.check_files([local_path('fr_spelling_str.po'),
                                        local_path('fr_language.po')])
 
         # be sure we have 2 files in result
