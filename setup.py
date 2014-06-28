@@ -22,12 +22,23 @@ from setuptools import setup
 from msgcheck.msgcheck import msgcheck_version
 
 DESCRIPTION = 'Perform various checks on gettext files.'
+LONG_DESCRIPTION = """
+MsgCheck performs various checks on gettext files:
+
+* compilation (with command `msgfmt -c`)
+* for each translation:
+  - number of lines in translated strings
+  - whitespace at beginning/end of strings
+  - trailing whitespace at end of lines inside strings
+  - punctuation at end of strings
+  - spelling (messages and translations).
+"""
 
 setup(
     name='msgcheck',
     version=msgcheck_version(),
     description=DESCRIPTION,
-    long_description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
     author='Sébastien Helleu',
     author_email='flashcode@flashtux.org',
     url='https://github.com/flashcode/msgcheck',
