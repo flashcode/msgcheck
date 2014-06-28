@@ -8,7 +8,7 @@
   * whitespace at beginning/end of strings
   * trailing whitespace at end of lines inside strings
   * punctuation at end of strings
-  * spelling
+  * spelling (messages and translations)
 
 The script requires Python >= 2.7.
 
