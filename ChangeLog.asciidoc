@@ -4,7 +4,7 @@
 :lang: en
 
 
-== Version 2.7 (under dev)
+== Version 2.7 (2014-06-28)
 
 * add argument id/str for -s/--spelling to check messages or translations
 * ensure pwl is not None before checking if file exists
