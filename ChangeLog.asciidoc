@@ -4,6 +4,10 @@
 :lang: en
 
 
+== Version 2.8 (under dev!)
+
+* sort and keep unique misspelled words with option -m/--only-misspelled
+
 == Version 2.7 (2014-06-28)
 
 * add argument id/str for -s/--spelling to check messages or translations
