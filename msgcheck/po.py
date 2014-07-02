@@ -71,18 +71,25 @@ class PoReport(object):
             return self.message + '\n---'
         if self.idmsg == 'compile':
             return '{0}\n{1}'.format('=' * 70, self.message)
-        msg = '{0}\n{1}:{2}: [{3}] {4}{5}'.format(
+        is_list = type(self.message) is list
+        count = '(%d)' % len(self.message) if is_list else ''
+        msg = '{0}\n{1}:{2}: [{3}{4}] {5}{6}'.format(
             '=' * 70,
             self.filename,
             self.line,
             self.idmsg,
+            count,
             '(fuzzy) ' if self.fuzzy else '',
-            self.message)
+            ', '.join(self.message) if is_list else self.message)
         if self.mid:
             msg += '\n---\n' + self.mid
         if self.mstr:
             msg += '\n---\n' + self.mstr
         return msg
+
+    def get_misspelled_words(self):
+        """Return list of misspelled words."""
+        return self.message if type(self.message) is list else []
 
 
 class PoMessage(object):
@@ -274,8 +281,8 @@ class PoMessage(object):
                         break
                 if misspelled_word:
                     misspelled.append(err.word)
-            for word in misspelled:
-                errors.append(PoReport(word, 'spelling-' + spelling,
+            if misspelled:
+                errors.append(PoReport(misspelled, 'spelling-' + spelling,
                                        self.filename, self.line, mid, mstr))
         return errors
 

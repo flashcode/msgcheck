@@ -134,8 +134,10 @@ def main():
             total_errors += len(reports)
             if not args.quiet:
                 if args.only_misspelled:
-                    words = [report.message for report in reports
-                             if report.idmsg.startswith('spelling-')]
+                    words = []
+                    for report in reports:
+                        for word in report.get_misspelled_words():
+                            words.append(word)
                     print('\n'.join(sorted(set(words),
                                            key=lambda s: s.lower())))
                 else:

@@ -109,7 +109,9 @@ class TestMsgCheck(unittest.TestCase):
         self.assertEquals(len(errors), 2)
         for i, word in enumerate(('Thsi', 'errro')):
             self.assertEquals(errors[i].idmsg, 'spelling-id')
-            self.assertEquals(errors[i].message, word)
+            self.assertTrue(type(errors[i].message) is list)
+            self.assertEquals(len(errors[i].message), 1)
+            self.assertEquals(errors[i].message[0], word)
 
     def test_spelling_str(self):
         """Test spelling on translated messages of gettext files."""
@@ -126,7 +128,9 @@ class TestMsgCheck(unittest.TestCase):
         self.assertEquals(len(errors), 2)
         for i, word in enumerate(('aabbcc', 'xxyyzz')):
             self.assertEquals(errors[i].idmsg, 'spelling-str')
-            self.assertEquals(errors[i].message, word)
+            self.assertTrue(type(errors[i].message) is list)
+            self.assertEquals(len(errors[i].message), 1)
+            self.assertEquals(errors[i].message[0], word)
 
         # second file has 1 error: dict/language "xyz" not found
         errors = result[1][1]
