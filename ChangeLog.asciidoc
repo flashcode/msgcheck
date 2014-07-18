@@ -1,4 +1,4 @@
-= MsgCheck ChangeLog
+= Msgcheck ChangeLog
 :author: Sébastien Helleu
 :email: flashcode@flashtux.org
 :lang: en
