@@ -4,7 +4,7 @@
 :lang: en
 
 
-== Version 2.8 (under dev)
+== Version 2.8 (2014-12-07)
 
 * fix read of fuzzy flag
 * display multiple misspelled words on same error line
