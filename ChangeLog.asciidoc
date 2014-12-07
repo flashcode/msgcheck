@@ -4,8 +4,9 @@
 :lang: en
 
 
-== Version 2.8 (under dev!)
+== Version 2.8 (under dev)
 
+* fix read of fuzzy flag
 * display multiple misspelled words on same error line
 * sort and keep unique misspelled words with option -m/--only-misspelled
 
