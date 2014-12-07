@@ -524,7 +524,7 @@ class PoCheck(object):
             else:
                 # compilation failed
                 if sys.version_info >= (3,):
-                    compile_output = compile_output.decode('utf-8')
+                    compile_output = bytes(compile_output).decode('utf-8')
                 result.append((po_file.filename,
                                [PoReport(compile_output, 'compile',
                                          po_file.filename)]))
