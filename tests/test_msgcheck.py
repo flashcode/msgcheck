@@ -26,6 +26,7 @@ import os
 import unittest
 
 from msgcheck.po import PoFile, PoCheck
+from msgcheck.utils import replace_formatters
 
 
 def local_path(filename):
@@ -95,6 +96,21 @@ class TestMsgCheck(unittest.TestCase):
         # the file has 11 errors (with the fuzzy string)
         self.assertEquals(len(result[0][1]), 11)
 
+    def test_replace_formatters(self):
+        """Test removal of formatters in a string."""
+        self.assertEquals(replace_formatters('%', '', 'c'), '')
+        self.assertEquals(replace_formatters('\\', '', 'c'), '\\')
+        self.assertEquals(replace_formatters('%s', ' ', 'c'), ' ')
+        self.assertEquals(replace_formatters('%.02f', ' ', 'c'), ' ')
+        self.assertEquals(replace_formatters('%!%s%!', '', 'c'), '%!%!')
+        self.assertEquals(replace_formatters('%.02!', ' ', 'c'), '%.02!')
+        self.assertEquals(
+            replace_formatters('%.3fThis is a %stest', ' ', 'c'),
+            ' This is a  test')
+        self.assertEquals(
+            replace_formatters('%.3fTest%s%d%%%.03f%luhere% s', '', 'c'),
+            'Test%here')
+
     def test_spelling_id(self):
         """Test spelling on source messages (English) of gettext files."""
         po_check = PoCheck()
@@ -104,7 +120,7 @@ class TestMsgCheck(unittest.TestCase):
         # be sure we have 1 file in result
         self.assertEquals(len(result), 1)
 
-        # the file has 2 spelling errors: words "Thsi" and "errro"
+        # the file has 2 spelling errors: "Thsi" and "errro"
         errors = result[0][1]
         self.assertEquals(len(errors), 2)
         for i, word in enumerate(('Thsi', 'errro')):
@@ -123,10 +139,10 @@ class TestMsgCheck(unittest.TestCase):
         # be sure we have 2 files in result
         self.assertEquals(len(result), 2)
 
-        # first file has 2 spelling errors: words "aabbcc" and "xxyyzz"
+        # first file has 3 spelling errors: "CecX", "aabbcc" and "xxyyzz"
         errors = result[0][1]
-        self.assertEquals(len(errors), 2)
-        for i, word in enumerate(('aabbcc', 'xxyyzz')):
+        self.assertEquals(len(errors), 3)
+        for i, word in enumerate(('CecX', 'aabbcc', 'xxyyzz')):
             self.assertEquals(errors[i].idmsg, 'spelling-str')
             self.assertTrue(type(errors[i].message) is list)
             self.assertEquals(len(errors[i].message), 1)

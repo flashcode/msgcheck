@@ -40,15 +40,7 @@ try:
 except ImportError:
     pass
 
-
-def count_lines(string):
-    """
-    Count the number of lines in a string or translation.
-    """
-    count = len(string.split('\n'))
-    if count > 1 and string.endswith('\n'):
-        count -= 1
-    return count
+from . utils import count_lines, replace_formatters
 
 
 # pylint: disable=too-few-public-methods
@@ -119,7 +111,7 @@ class PoMessage(object):
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, filename, line, msg, charset, fuzzy):
+    def __init__(self, filename, line, msg, charset, fuzzy, fmt):
         """Build a PO message."""
         self.filename = filename
         self.line = line
@@ -144,6 +136,7 @@ class PoMessage(object):
         else:
             self.messages.append((msg.get('msgid', ''), msg.get('msgstr', '')))
         self.fuzzy = fuzzy
+        self.fmt = fmt
 
     def check_lines(self):
         """
@@ -271,7 +264,10 @@ class PoMessage(object):
         for mid, mstr in self.messages:
             if not mid or not mstr:
                 continue
-            checkers[0].set_text(mstr if spelling == 'str' else mid)
+            text = mstr if spelling == 'str' else mid
+            if self.fmt:
+                text = replace_formatters(text, ' ', self.fmt)
+            checkers[0].set_text(text)
             misspelled = []
             for err in checkers[0]:
                 misspelled_word = True
@@ -302,7 +298,7 @@ class PoFile(object):
         }
         self.msgs = []
 
-    def _add_message(self, numline_msgid, msgfuzzy, msg):
+    def _add_message(self, numline_msgid, fuzzy, fmt, msg):
         """
         Add a message from PO file in list of messages.
         """
@@ -319,15 +315,16 @@ class PoFile(object):
             if match:
                 self.props['charset'] = match.group(1)
         self.msgs.append(PoMessage(self.filename, numline_msgid, msg,
-                                   self.props['charset'], msgfuzzy))
+                                   self.props['charset'], fuzzy, fmt))
 
     def read(self):
         """
         Read messages in PO file.
         """
         self.msgs = []
-        (numline, numline_msgid) = (0, 0)
-        (fuzzy, msgfuzzy) = (False, False)
+        numline, numline_msgid = (0, 0)
+        fuzzy, msgfuzzy = (False, False)
+        fmt, msgfmt = (None, None)
         msg = {}
         msgcurrent = ''
         with open(self.filename, 'r') as po_file:
@@ -338,6 +335,9 @@ class PoFile(object):
                     continue
                 if line.startswith('#,'):
                     fuzzy = 'fuzzy' in line
+                    match = re.search(r'([a-z-]+)-format', line, re.IGNORECASE)
+                    fmt = match.group(1) if match else None
+                if line.startswith('#'):
                     continue
                 if line.startswith('msg'):
                     match = re.match(
@@ -351,9 +351,12 @@ class PoFile(object):
                             if oldmsgcurrent.startswith('msgstr'):
                                 self._add_message(numline_msgid,
                                                   msgfuzzy,
+                                                  msgfmt,
                                                   msg)
                             msgfuzzy = fuzzy
                             fuzzy = False
+                            msgfmt = fmt
+                            fmt = None
                             msg = {}
                             numline_msgid = numline
                 if msgcurrent and line.startswith('"'):
@@ -361,6 +364,7 @@ class PoFile(object):
             if msgcurrent.startswith('msgstr'):
                 self._add_message(numline_msgid,
                                   msgfuzzy,
+                                  msgfmt,
                                   msg)
 
     def compile(self):

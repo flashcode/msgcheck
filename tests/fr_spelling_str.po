@@ -35,8 +35,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "This is a test.\n"
-msgstr "Ceci est un test.\n"
+#, c-format
+msgid "%.3fThis is a test.\n"
+msgstr "%.3fCeci est un test.\n"
+
+#, c-format
+msgid "%.3fThis is another test.\n"
+msgstr "%.3fCecX est un autre test.\n"
 
 msgid "Test 1"
 msgstr "aabbcc"
