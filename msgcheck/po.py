@@ -404,10 +404,12 @@ class PoCheck(object):
         self.pwl = None
 
     def __repr__(self):
-        return ('checks: {self.checks}, '
-                'dicts: {self.dicts}, '
-                'extra_checkers: {self.extra_checkers}, '
-                'pwl: {self.pwl}'.format(self=self))
+        return ('checks: {0}, dicts: {1}, '
+                'extra_checkers: {2}, pwl: {3}'.format(
+                    self.checks,
+                    self.dicts,
+                    self.extra_checkers,
+                    self.pwl))
 
     def set_check(self, check, state):
         """Enable/disable a specific check."""
