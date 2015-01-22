@@ -38,6 +38,7 @@ def count_lines(string):
     return count
 
 
+# pylint: disable=too-many-branches
 def replace_formatters(string, replace, fmt):
     """
     Replace formatters (like "%s" or "%03d") with a replacement string.
