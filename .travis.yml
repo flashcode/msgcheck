@@ -13,6 +13,6 @@ install:
   - "pip install -r requirements.txt"
 
 script:
-  - pylint msgcheck
-  - pylint tests
+  - pylint --disable=W0511 msgcheck
+  - pylint --disable=W0511 tests
   - nosetests
