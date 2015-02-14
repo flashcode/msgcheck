@@ -30,6 +30,7 @@ STR_FORMATTERS = {
     'c': ('\\', '%', '#- +\'I.0123456789hlLqjzt', 'diouxXeEfFgGaAcsCSpnm'),
 }
 
+
 def count_lines(string):
     """Count the number of lines in a string or translation."""
     count = len(string.split('\n'))
