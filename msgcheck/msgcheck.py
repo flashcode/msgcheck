@@ -129,21 +129,21 @@ def main():
     # display error messages
     files_ok, files_with_errors, total_errors = 0, 0, 0
     for filename, reports in result:
-        if reports:
-            files_with_errors += 1
-            total_errors += len(reports)
-            if not args.quiet:
-                if args.only_misspelled:
-                    words = []
-                    for report in reports:
-                        for word in report.get_misspelled_words():
-                            words.append(word)
-                    print('\n'.join(sorted(set(words),
-                                           key=lambda s: s.lower())))
-                else:
-                    print('\n'.join([str(report) for report in reports]))
-        else:
+        if not reports:
             files_ok += 1
+            continue
+        files_with_errors += 1
+        total_errors += len(reports)
+        if not args.quiet:
+            if args.only_misspelled:
+                words = []
+                for report in reports:
+                    for word in report.get_misspelled_words():
+                        words.append(word)
+                print('\n'.join(sorted(set(words),
+                                       key=lambda s: s.lower())))
+            else:
+                print('\n'.join([str(report) for report in reports]))
 
     # exit now if we extracted translations or if we displayed only
     # misspelled words
