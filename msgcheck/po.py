@@ -63,7 +63,7 @@ class PoReport(object):
             return self.message + '\n---'
         if self.idmsg == 'compile':
             return '{0}\n{1}'.format('=' * 70, self.message)
-        is_list = type(self.message) is list
+        is_list = isinstance(self.message, list)
         count = '(%d)' % len(self.message) if is_list else ''
         msg = '{0}\n{1}:{2}: [{3}{4}] {5}{6}'.format(
             '=' * 70,
@@ -81,7 +81,7 @@ class PoReport(object):
 
     def get_misspelled_words(self):
         """Return list of misspelled words."""
-        return self.message if type(self.message) is list else []
+        return self.message if isinstance(self.message, list) else []
 
 
 class PoMessage(object):

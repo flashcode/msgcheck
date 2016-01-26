@@ -125,7 +125,7 @@ class TestMsgCheck(unittest.TestCase):
         self.assertEquals(len(errors), 2)
         for i, word in enumerate(('Thsi', 'errro')):
             self.assertEquals(errors[i].idmsg, 'spelling-id')
-            self.assertTrue(type(errors[i].message) is list)
+            self.assertTrue(isinstance(errors[i].message, list))
             self.assertEquals(len(errors[i].message), 1)
             self.assertEquals(errors[i].message[0], word)
 
@@ -144,7 +144,7 @@ class TestMsgCheck(unittest.TestCase):
         self.assertEquals(len(errors), 3)
         for i, word in enumerate(('CecX', 'aabbcc', 'xxyyzz')):
             self.assertEquals(errors[i].idmsg, 'spelling-str')
-            self.assertTrue(type(errors[i].message) is list)
+            self.assertTrue(isinstance(errors[i].message, list))
             self.assertEquals(len(errors[i].message), 1)
             self.assertEquals(errors[i].message[0], word)
 
