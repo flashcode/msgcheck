@@ -41,10 +41,10 @@ class TestMsgCheck(unittest.TestCase):
     def test_compilation(self):
         """Test compilation of gettext files."""
         # valid file
-        self.assertEquals(PoFile(local_path('fr.po')).compile()[1], 0)
+        self.assertEqual(PoFile(local_path('fr.po')).compile()[1], 0)
 
         # invalid file
-        self.assertEquals(PoFile(local_path('fr_compile.po')).compile()[1], 1)
+        self.assertEqual(PoFile(local_path('fr_compile.po')).compile()[1], 1)
 
     def test_read(self):
         """Test read of gettext files."""
@@ -69,20 +69,20 @@ class TestMsgCheck(unittest.TestCase):
                                        local_path('fr_errors.po')])
 
         # be sure we have 2 files in result
-        self.assertEquals(len(result), 2)
+        self.assertEqual(len(result), 2)
 
         # first file has no errors
-        self.assertEquals(len(result[0][1]), 0)
+        self.assertEqual(len(result[0][1]), 0)
 
         # second file has 10 errors
-        self.assertEquals(len(result[1][1]), 10)
+        self.assertEqual(len(result[1][1]), 10)
         errors = {}
         for report in result[1][1]:
             errors[report.idmsg] = errors.get(report.idmsg, 0) + 1
-        self.assertEquals(errors['lines'], 2)
-        self.assertEquals(errors['punct'], 2)
-        self.assertEquals(errors['whitespace'], 4)
-        self.assertEquals(errors['whitespace_eol'], 2)
+        self.assertEqual(errors['lines'], 2)
+        self.assertEqual(errors['punct'], 2)
+        self.assertEqual(errors['whitespace'], 4)
+        self.assertEqual(errors['whitespace_eol'], 2)
 
     def test_checks_fuzzy(self):
         """Test checks on a gettext file including fuzzy strings."""
@@ -91,23 +91,23 @@ class TestMsgCheck(unittest.TestCase):
         result = po_check.check_files([local_path('fr_errors.po')])
 
         # be sure we have one file in result
-        self.assertEquals(len(result), 1)
+        self.assertEqual(len(result), 1)
 
         # the file has 11 errors (with the fuzzy string)
-        self.assertEquals(len(result[0][1]), 11)
+        self.assertEqual(len(result[0][1]), 11)
 
     def test_replace_formatters(self):
         """Test removal of formatters in a string."""
-        self.assertEquals(replace_formatters('%', '', 'c'), '')
-        self.assertEquals(replace_formatters('\\', '', 'c'), '\\')
-        self.assertEquals(replace_formatters('%s', ' ', 'c'), ' ')
-        self.assertEquals(replace_formatters('%.02f', ' ', 'c'), ' ')
-        self.assertEquals(replace_formatters('%!%s%!', '', 'c'), '%!%!')
-        self.assertEquals(replace_formatters('%.02!', ' ', 'c'), '%.02!')
-        self.assertEquals(
+        self.assertEqual(replace_formatters('%', '', 'c'), '')
+        self.assertEqual(replace_formatters('\\', '', 'c'), '\\')
+        self.assertEqual(replace_formatters('%s', ' ', 'c'), ' ')
+        self.assertEqual(replace_formatters('%.02f', ' ', 'c'), ' ')
+        self.assertEqual(replace_formatters('%!%s%!', '', 'c'), '%!%!')
+        self.assertEqual(replace_formatters('%.02!', ' ', 'c'), '%.02!')
+        self.assertEqual(
             replace_formatters('%.3fThis is a %stest', ' ', 'c'),
             ' This is a  test')
-        self.assertEquals(
+        self.assertEqual(
             replace_formatters('%.3fTest%s%d%%%.03f%luhere% s', '', 'c'),
             'Test%here')
 
@@ -118,16 +118,16 @@ class TestMsgCheck(unittest.TestCase):
         result = po_check.check_files([local_path('fr_spelling_id.po')])
 
         # be sure we have 1 file in result
-        self.assertEquals(len(result), 1)
+        self.assertEqual(len(result), 1)
 
         # the file has 2 spelling errors: "Thsi" and "errro"
         errors = result[0][1]
-        self.assertEquals(len(errors), 2)
+        self.assertEqual(len(errors), 2)
         for i, word in enumerate(('Thsi', 'errro')):
-            self.assertEquals(errors[i].idmsg, 'spelling-id')
+            self.assertEqual(errors[i].idmsg, 'spelling-id')
             self.assertTrue(isinstance(errors[i].message, list))
-            self.assertEquals(len(errors[i].message), 1)
-            self.assertEquals(errors[i].message[0], word)
+            self.assertEqual(len(errors[i].message), 1)
+            self.assertEqual(errors[i].message[0], word)
 
     def test_spelling_str(self):
         """Test spelling on translated messages of gettext files."""
@@ -137,27 +137,27 @@ class TestMsgCheck(unittest.TestCase):
                                        local_path('fr_language.po')])
 
         # be sure we have 2 files in result
-        self.assertEquals(len(result), 2)
+        self.assertEqual(len(result), 2)
 
         # first file has 3 spelling errors: "CecX", "aabbcc" and "xxyyzz"
         errors = result[0][1]
-        self.assertEquals(len(errors), 3)
+        self.assertEqual(len(errors), 3)
         for i, word in enumerate(('CecX', 'aabbcc', 'xxyyzz')):
-            self.assertEquals(errors[i].idmsg, 'spelling-str')
+            self.assertEqual(errors[i].idmsg, 'spelling-str')
             self.assertTrue(isinstance(errors[i].message, list))
-            self.assertEquals(len(errors[i].message), 1)
-            self.assertEquals(errors[i].message[0], word)
+            self.assertEqual(len(errors[i].message), 1)
+            self.assertEqual(errors[i].message[0], word)
 
         # second file has 1 error: dict/language "xyz" not found
         errors = result[1][1]
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(errors[0].idmsg, 'dict')
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].idmsg, 'dict')
 
     def test_spelling_bad_dict(self):
         """Test spelling with a bad dict option."""
         po_check = PoCheck()
         po_check.set_spelling_options('str', 'xxx', None)
-        self.assertEquals(len(po_check.extra_checkers), 0)
+        self.assertEqual(len(po_check.extra_checkers), 0)
 
     def test_spelling_bad_pwl(self):
         """Test spelling with a bad pwl option."""
