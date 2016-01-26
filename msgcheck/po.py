@@ -32,13 +32,12 @@ import sys
 
 # enchant module is optional, spelling is checked on demand
 # (argument -s/--spell)
-ENCHANT_FOUND = False
 try:
     from enchant import Dict, DictWithPWL, DictNotFoundError
     from enchant.checker import SpellChecker
     ENCHANT_FOUND = True
 except ImportError:
-    pass
+    ENCHANT_FOUND = False
 
 from . utils import count_lines, replace_formatters
 
@@ -520,7 +519,6 @@ class PoCheck(object):
                                          po_file.filename)]))
                 continue
             # compile the file (except if disabled)
-            compile_output = ''
             compile_rc = 0
             if self.checks['compile']:
                 compile_output, compile_rc = po_file.compile()
