@@ -1,4 +1,6 @@
-## Description
+## msgcheck
+
+[![Build Status](https://travis-ci.org/flashcode/msgcheck.svg?branch=master)](https://travis-ci.org/flashcode/msgcheck)
 
 `msgcheck` performs various checks on gettext files (with extension ".po"):
 
@@ -13,8 +15,6 @@
 The script requires Python >= 2.7.
 
 Module `pyenchant` is required if spelling is checked (option `-s`).
-
-[![Build Status](https://travis-ci.org/flashcode/msgcheck.svg?branch=master)](https://travis-ci.org/flashcode/msgcheck)
 
 ## Install
 
