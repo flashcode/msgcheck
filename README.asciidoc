@@ -1,36 +1,45 @@
-## msgcheck
+= msgcheck
+:author: Sébastien Helleu
+:email: flashcode@flashtux.org
+:lang: en
 
-[![Build Status](https://travis-ci.org/flashcode/msgcheck.svg?branch=master)](https://travis-ci.org/flashcode/msgcheck)
+image:https://travis-ci.org/flashcode/msgcheck.svg?branch=master["Build Status", link="https://travis-ci.org/flashcode/msgcheck"]
 
 `msgcheck` performs various checks on gettext files (with extension ".po"):
 
 * compilation (with command `msgfmt -c`)
 * for each translation:
-  * number of lines in translated strings
-  * whitespace at beginning/end of strings
-  * trailing whitespace at end of lines inside strings
-  * punctuation at end of strings
-  * spelling (messages and translations)
+** number of lines in translated strings
+** whitespace at beginning/end of strings
+** trailing whitespace at end of lines inside strings
+** punctuation at end of strings
+** spelling (messages and translations)
 
 The script requires Python >= 2.7.
 
 Module `pyenchant` is required if spelling is checked (option `-s`).
 
-## Install
+== Install
 
 Install a released version from the Python package index with pip:
 
-    $ pip install msgcheck
+----
+$ pip install msgcheck
+----
 
 Install via source distribution:
 
-    $ python setup.py install
+----
+$ python setup.py install
+----
 
-## Usage
+== Usage
 
 Syntax:
 
-    $ msgcheck [options] file.po [file.po...]
+----
+$ msgcheck [options] file.po [file.po...]
+----
 
 Options:
 
@@ -57,38 +66,42 @@ Options:
 
 Environment variable `MSGCHECK_OPTIONS` can be set with some default options.
 
-The script returns following exit code:
-  0: all files checked are OK (0 errors) (or --extract given)
-  n: number of files with errors (n >= 1)
+The script returns exit code *0* if all files checked are OK
+(0 errors or option `--extract` given) or it returns *n*: number of files with
+errors (n >= 1).
 
-## Example
+== Example
 
-    $ msgcheck fr.po
-    ======================================================================
-    /path/to/fr.po:242: [punct] end punctuation: ":" in translation, ":" not in string:
-    ---
-    error
-    ---
-    erreur:
-    ======================================================================
-    /path/to/fr.po:262: [lines] number of lines: 1 in string, 2 in translation:
-    ---
-    Message filters:
-    ---
-    Filtres de
-    messages:
-    ======================================================================
-    /path/to/fr.po:336: [whitespace] spaces at beginning: 0 in string, 1 in translation:
-    ---
-    current value
-    ---
-     valeur courante
-    ======================================================================
-    /path/to/fr.po: 3 errors (almost good!)
+----
+$ msgcheck fr.po
+======================================================================
+/path/to/fr.po:242: [punct] end punctuation: ":" in translation, ":" not in string:
+---
+error
+---
+erreur:
+======================================================================
+/path/to/fr.po:262: [lines] number of lines: 1 in string, 2 in translation:
+---
+Message filters:
+---
+Filtres de
+messages:
+======================================================================
+/path/to/fr.po:336: [whitespace] spaces at beginning: 0 in string, 1 in translation:
+---
+current value
+---
+ valeur courante
+======================================================================
+/path/to/fr.po: 3 errors (almost good!)
+----
 
-## Copyright
+== Copyright
 
 Copyright (C) 2009-2016 Sébastien Helleu <flashcode@flashtux.org>
+
+This file is part of msgcheck.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
