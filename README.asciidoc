@@ -13,11 +13,12 @@ image:https://travis-ci.org/flashcode/msgcheck.svg?branch=master["Build Status",
 ** whitespace at beginning/end of strings
 ** trailing whitespace at end of lines inside strings
 ** punctuation at end of strings
-** spelling (messages and translations)
+** spelling (messages and translations).
 
-The script requires Python >= 2.7.
+The script requires:
 
-Module `pyenchant` is required if spelling is checked (option `-s`).
+* Python >= 2.7
+* the module `pyenchant` if spelling is checked (with option `-s`).
 
 == Install
 
@@ -27,7 +28,7 @@ Install a released version from the Python package index with pip:
 $ pip install msgcheck
 ----
 
-Install via source distribution:
+Or you can install via source distribution:
 
 ----
 $ python setup.py install
@@ -52,8 +53,8 @@ Options:
   `str` = translations)
 * `-d <dicts>`, `--dicts <dicts>`: comma-separated list of extra dictionaries
   to use (in addition to file language)
-* `-P <file>`, `--pwl <file>`: file with personal word list used when checking
-  spelling
+* `-P <file>`, `--pwl <file>`: file with personal list of words used when
+  checking spelling
 * `-m`, `--only-misspelled`: display only misspelled words (no error, line
   number and translation)
 * `-w`, `--no-whitespace`: do not check whitespace at beginning/end of strings
@@ -64,11 +65,12 @@ Options:
 * `-q`, `--quiet`: quiet mode: only display number of errors
 * `-v`, `--version`: display version and exit
 
-Environment variable `MSGCHECK_OPTIONS` can be set with some default options.
+The environment variable `MSGCHECK_OPTIONS` can be set with some default
+options.
 
 The script returns exit code *0* if all files checked are OK
-(0 errors or option `--extract` given) or it returns *n*: number of files with
-errors (n >= 1).
+(0 errors or option `--extract` given) or it returns *N*: number of files with
+errors (N >= 1).
 
 == Example
 

@@ -82,7 +82,7 @@
 == Version 1.5 (2013-09-15)
 
 * add option "-s" (or "--spelling") to check spelling and option "--pwl" to
-  use a personal word list (with module "python-enchant")
+  use a personal list of words (with module "python-enchant")
 
 == Version 1.4 (2013-09-14)
 

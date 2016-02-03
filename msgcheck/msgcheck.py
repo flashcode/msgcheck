@@ -75,7 +75,7 @@ The script returns:
                         help='comma-separated list of extra dictionaries '
                         'to use (in addition to file language)')
     parser.add_argument('-P', '--pwl',
-                        help='file with personal word list used when '
+                        help='file with personal list of words used when '
                         'checking spelling')
     parser.add_argument('-m', '--only-misspelled', action='store_true',
                         help='display only misspelled words (no error, '
