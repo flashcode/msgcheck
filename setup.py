@@ -21,7 +21,7 @@
 from setuptools import setup
 from msgcheck.msgcheck import msgcheck_version
 
-DESCRIPTION = 'Perform various checks on gettext files.'
+DESCRIPTION = 'Gettext file checker.'
 LONG_DESCRIPTION = """
 MsgCheck performs various checks on gettext files:
 

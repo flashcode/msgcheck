@@ -19,7 +19,7 @@
 #
 
 """
-Perform various checks on gettext files.
+Gettext file checker.
 """
 
 from . import msgcheck

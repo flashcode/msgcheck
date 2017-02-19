@@ -52,7 +52,7 @@ def msgcheck_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         fromfile_prefix_chars='@',
-        description='Perform various checks on gettext files.',
+        description='Gettext file checker.',
         epilog='''
 Environment variable "MSGCHECK_OPTIONS" can be set with default options.
 Argument "@file.txt" can be used to read default options in a file.
