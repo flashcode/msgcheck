@@ -301,7 +301,7 @@ class PoFile(object):
         """
         Add a message from PO file in list of messages.
         """
-        if 'msgid' in msg and len(msg['msgid']) == 0:
+        if 'msgid' in msg and not msg['msgid']:
             # find file language/charset in properties
             # (first string without msgid)
             match = re.search(r'language: ([a-zA-Z-_]+)',
@@ -330,7 +330,7 @@ class PoFile(object):
             for line in po_file:
                 numline += 1
                 line = line.strip()
-                if len(line) == 0:
+                if not line:
                     continue
                 if line.startswith('#,'):
                     fuzzy = 'fuzzy' in line
