@@ -59,10 +59,10 @@ setup(
         'Topic :: Software Development :: Localization',
     ],
     packages=['msgcheck'],
-    tests_require = ['nose'],
-    test_suite = "nose.collector",
+    tests_require=['nose'],
+    test_suite="nose.collector",
     install_requires=['pyenchant'],
-    entry_points = {
-        'console_scripts': ['msgcheck = msgcheck.msgcheck:main'],
+    entry_points={
+        'console_scripts': ['msgcheck=msgcheck.msgcheck:main'],
     }
 )
