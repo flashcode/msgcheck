@@ -1,16 +1,28 @@
 language: python
+sudo: false
 
 python:
   - "2.7"
   - "3.4"
+  - "3.5"
+  - "3.6"
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y gettext aspell aspell-fr libenchant-dev
+cache:
+  - pip
+  - apt
+
+addons:
+  apt:
+    packages:
+      - gettext
+      - aspell
+      - aspell-en
+      - aspell-fr
+      - libenchant-dev
 
 install:
-  - "pip install pylint"
-  - "pip install -r requirements.txt"
+  - pip install -U pylint
+  - pip install -Ur requirements.txt
 
 script:
   - pylint --disable=W0511 msgcheck
