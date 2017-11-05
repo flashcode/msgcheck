@@ -65,6 +65,8 @@ The script returns:
                         help='do not check compilation of file')
     parser.add_argument('-f', '--fuzzy', action='store_true',
                         help='check fuzzy strings')
+    parser.add_argument('-n', '--skip-noqa', action='store_true',
+                        help='do not check "noqa"-commented lines')
     parser.add_argument('-l', '--no-lines', action='store_true',
                         help='do not check number of lines')
     parser.add_argument('-p', '--no-punct', action='store_true',
@@ -112,7 +114,7 @@ def main():
 
     # create checker and set boolean options
     po_check = PoCheck()
-    for option in ('no_compile', 'fuzzy', 'no_lines', 'no_punct',
+    for option in ('no_compile', 'fuzzy', 'skip_noqa', 'no_lines', 'no_punct',
                    'no_whitespace', 'no_whitespace_eol', 'extract'):
         if args.__dict__[option]:
             po_check.set_check(option.lstrip('no_'),

@@ -96,6 +96,17 @@ class TestMsgCheck(unittest.TestCase):
         # the file has 11 errors (with the fuzzy string)
         self.assertEqual(len(result[0][1]), 11)
 
+    def test_checks_noqa(self):
+        """Test checks on a gettext file ignoring `noqa`-commented lines."""
+        po_check = PoCheck()
+        po_check.set_check('skip_noqa', True)
+        result = po_check.check_files([local_path('fr_errors.po')])
+        # be sure we have one file in result
+        self.assertEqual(len(result), 1)
+
+        # the file has 9 errors (`noqa` was skipped)
+        self.assertEqual(len(result[0][1]), 9)
+
     def test_replace_formatters_c(self):
         """Test removal of formatters in a C string."""
         self.assertEqual(replace_formatters('%s', 'c'), '')

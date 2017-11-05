@@ -110,7 +110,7 @@ class PoMessage(object):
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, filename, line, msg, charset, fuzzy, fmt):
+    def __init__(self, filename, line, msg, charset, fuzzy, fmt, noqa):
         """Build a PO message."""
         self.filename = filename
         self.line = line
@@ -136,6 +136,7 @@ class PoMessage(object):
             self.messages.append((msg.get('msgid', ''), msg.get('msgstr', '')))
         self.fuzzy = fuzzy
         self.fmt = fmt
+        self.noqa = noqa
 
     def check_lines(self):
         """
@@ -297,7 +298,8 @@ class PoFile(object):
         }
         self.msgs = []
 
-    def _add_message(self, numline_msgid, fuzzy, fmt, msg):
+    # pylint: disable=too-many-arguments
+    def _add_message(self, numline_msgid, fuzzy, fmt, noqa, msg):
         """
         Add a message from PO file in list of messages.
         """
@@ -314,7 +316,7 @@ class PoFile(object):
             if match:
                 self.props['charset'] = match.group(1)
         self.msgs.append(PoMessage(self.filename, numline_msgid, msg,
-                                   self.props['charset'], fuzzy, fmt))
+                                   self.props['charset'], fuzzy, fmt, noqa))
 
     def read(self):
         """
@@ -323,6 +325,7 @@ class PoFile(object):
         self.msgs = []
         numline, numline_msgid = (0, 0)
         fuzzy, msgfuzzy = (False, False)
+        noqa, msgnoqa = (False, False)
         fmt, msgfmt = (None, None)
         msg = {}
         msgcurrent = ''
@@ -337,6 +340,7 @@ class PoFile(object):
                     match = re.search(r'([a-z-]+)-format', line, re.IGNORECASE)
                     fmt = match.group(1) if match else None
                 if line.startswith('#'):
+                    noqa = 'noqa' in line
                     continue
                 if line.startswith('msg'):
                     match = re.match(
@@ -351,9 +355,12 @@ class PoFile(object):
                                 self._add_message(numline_msgid,
                                                   msgfuzzy,
                                                   msgfmt,
+                                                  msgnoqa,
                                                   msg)
                             msgfuzzy = fuzzy
+                            msgnoqa = noqa
                             fuzzy = False
+                            noqa = False
                             msgfmt = fmt
                             fmt = None
                             msg = {}
@@ -364,6 +371,7 @@ class PoFile(object):
                 self._add_message(numline_msgid,
                                   msgfuzzy,
                                   msgfmt,
+                                  msgnoqa,
                                   msg)
 
     def compile(self):
@@ -389,6 +397,7 @@ class PoCheck(object):
         self.checks = {
             'compile': True,
             'fuzzy': False,
+            'skip_noqa': False,
             'lines': True,
             'punct': True,
             'whitespace': True,
@@ -478,7 +487,10 @@ class PoCheck(object):
 
         # check all messages
         check_fuzzy = self.checks['fuzzy']
+        skip_noqa = self.checks['skip_noqa']
         for msg in po_file.msgs:
+            if skip_noqa and msg.noqa:
+                continue
             if msg.fuzzy and not check_fuzzy:
                 continue
             if self.checks['extract']:
