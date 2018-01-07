@@ -239,8 +239,8 @@ class PoMessage(object):
             strlines = mstr.split('\n')
             if len(idlines) < 2 or len(idlines) != len(strlines):
                 continue
-            for i in range(0, len(idlines)):
-                endin = len(idlines[i]) - len(idlines[i].rstrip(' '))
+            for i, idline in enumerate(idlines):
+                endin = len(idline) - len(idline.rstrip(' '))
                 endout = len(strlines[i]) - len(strlines[i].rstrip(' '))
                 if (endin > 0 or endout > 0) and endin != endout:
                     errors.append(
