@@ -28,6 +28,7 @@ from collections import defaultdict
 import re
 
 
+# TODO: add support for other languages
 STR_FORMATTERS = defaultdict(list)
 STR_FORMATTERS.update({
     'c': (
