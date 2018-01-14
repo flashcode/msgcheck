@@ -96,20 +96,54 @@ class TestMsgCheck(unittest.TestCase):
         # the file has 11 errors (with the fuzzy string)
         self.assertEqual(len(result[0][1]), 11)
 
-    def test_replace_formatters(self):
-        """Test removal of formatters in a string."""
-        self.assertEqual(replace_formatters('%', '', 'c'), '')
-        self.assertEqual(replace_formatters('\\', '', 'c'), '\\')
-        self.assertEqual(replace_formatters('%s', ' ', 'c'), ' ')
-        self.assertEqual(replace_formatters('%.02f', ' ', 'c'), ' ')
-        self.assertEqual(replace_formatters('%!%s%!', '', 'c'), '%!%!')
-        self.assertEqual(replace_formatters('%.02!', ' ', 'c'), '%.02!')
+    def test_replace_formatters_c(self):
+        """Test removal of formatters in a C string."""
+        self.assertEqual(replace_formatters('%s', 'c'), '')
+        self.assertEqual(replace_formatters('%%', 'c'), '%')
+        self.assertEqual(replace_formatters('%.02f', 'c'), '')
+        self.assertEqual(replace_formatters('%!%s%!', 'c'), '%!%!')
+        self.assertEqual(replace_formatters('%.02!', 'c'), '%.02!')
         self.assertEqual(
-            replace_formatters('%.3fThis is a %stest', ' ', 'c'),
-            ' This is a  test')
+            replace_formatters('%.3fThis is a %stest', 'c'),
+            'This is a test')
         self.assertEqual(
-            replace_formatters('%.3fTest%s%d%%%.03f%luhere% s', '', 'c'),
+            replace_formatters('%.3fTest%s%d%%%.03f%luhere% s', 'c'),
             'Test%here')
+
+    def test_replace_formatters_python(self):
+        """Test removal of formatters in a python string."""
+        # str.__mod__()
+        self.assertEqual(replace_formatters('%s', 'python'), '')
+        self.assertEqual(replace_formatters('%b', 'python'), '')
+        self.assertEqual(replace_formatters('%%', 'python'), '%')
+        self.assertEqual(replace_formatters('%.02f', 'python'), '')
+        self.assertEqual(replace_formatters('%(sth)s', 'python'), 'sth')
+        self.assertEqual(replace_formatters('%(sth)02f', 'python'), 'sth')
+        # str.format()
+        conditions = [
+            (
+                'First, thou shalt count to {0}', 'First, thou shalt count to ',
+                'References first positional argument'),
+            (
+                'Bring me a {}', 'Bring me a ',
+                'Implicitly references the first positional argument'),
+            ('From {} to {}', 'From  to ', 'Same as "From {0} to {1}"'),
+            (
+                'My quest is {name}', 'My quest is ',
+                'References keyword argument \'name\''),
+            (
+                'Weight in tons {0.weight}', 'Weight in tons ',
+                '\'weight\' attribute of first positional arg'),
+            (
+                'Units destroyed: {players[0]}', 'Units destroyed: ',
+                'First element of keyword argument \'players\'.'),
+        ]
+        for condition in conditions:
+            self.assertEqual(
+                replace_formatters(condition[0], 'python'),
+                condition[1],
+                condition[2],
+            )
 
     def test_spelling_id(self):
         """Test spelling on source messages (English) of gettext files."""

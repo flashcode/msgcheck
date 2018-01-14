@@ -265,7 +265,7 @@ class PoMessage(object):
                 continue
             text = mstr if spelling == 'str' else mid
             if self.fmt:
-                text = replace_formatters(text, ' ', self.fmt)
+                text = replace_formatters(text, self.fmt)
             checkers[0].set_text(text)
             misspelled = []
             for err in checkers[0]:

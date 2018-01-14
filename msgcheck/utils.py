@@ -24,11 +24,23 @@ Some utility functions for msgcheck.
 
 from __future__ import print_function
 
+import re
+from collections import defaultdict
 
-# TODO: add support for other languages
-STR_FORMATTERS = {
-    'c': ('\\', '%', '#- +\'I.0123456789hlLqjzt', 'diouxXeEfFgGaAcsCSpnm'),
-}
+
+STR_FORMATTERS = defaultdict(list)
+STR_FORMATTERS.update({
+    'c': (
+        (r'[\%]{2}', '%'),
+        (r'\%([ hlL\d\.\-\+\#\*]+)?[cdieEfgGosuxXpn]', r''),
+    ),
+    'python': [
+        (r'[\%]{2}', '%'),
+        (r'\%([.\d]+)?[bcdeEfFgGnosxX]', r''),
+        (r'\%(\(([^)]*)\))([.\d]+)?[bcdeEfFgGnosxX]', r'\g<2>'),
+        (r'\{([^\:\}]*)?(:[^\}]*)?\}', r''),
+    ]
+})
 
 
 def count_lines(string):
@@ -39,47 +51,10 @@ def count_lines(string):
     return count
 
 
-# pylint: disable=too-many-branches
-def replace_formatters(string, replace, fmt):
-    """
+def replace_formatters(string, fmt):
+    r"""
     Replace formatters (like "%s" or "%03d") with a replacement string.
     """
-    if fmt not in STR_FORMATTERS:
-        return string
-    formatters = STR_FORMATTERS[fmt]
-    formatter, escape = (False, False)
-    strformat = []
-    result = []
-
-    for char in string:
-        if formatter:
-            if char == formatters[1]:
-                result.append(char)
-                formatter = False
-            elif char in formatters[2]:
-                strformat.append(char)
-            elif char in formatters[3]:
-                result.append(replace)
-                formatter = False
-            else:
-                strformat.append(char)
-                result += strformat
-                formatter = False
-        elif escape:
-            result.append(formatters[0])
-            result.append(char)
-            escape = False
-        elif char == formatters[0]:
-            escape = True
-        elif char == formatters[1]:
-            formatter = True
-            strformat = [char]
-        else:
-            result.append(char)
-
-    if escape:  # unterminated escaped char?
-        result.append(formatters[0])
-    elif formatter:  # unterminated formatter?
-        result.append(replace)
-
-    return ''.join(result)
+    for pattern, repl in STR_FORMATTERS[fmt]:
+        string = re.sub(pattern, repl, string)
+    return string
