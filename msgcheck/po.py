@@ -42,12 +42,10 @@ except ImportError:
 from . utils import count_lines, replace_formatters
 
 
-# pylint: disable=too-few-public-methods
-class PoReport(object):
+class PoReport(object):  # pylint: disable=too-few-public-methods
     """A message in report (commonly an error in detected in gettext file)."""
 
-    # pylint: disable=too-many-arguments
-    def __init__(self, message, idmsg='', filename='-', line=0, mid='',
+    def __init__(self, message, idmsg='', filename='-', line=0, mid='',  # pylint: disable=too-many-arguments
                  mstr='', fuzzy=False):
         self.message = message
         self.idmsg = idmsg
@@ -109,8 +107,7 @@ class PoMessage(object):
               ('%d files found', '%d fichiers trouvés')]
     """
 
-    # pylint: disable=too-many-arguments
-    def __init__(self, filename, line, msg, charset, fuzzy, fmt, noqa):
+    def __init__(self, filename, line, msg, charset, fuzzy, fmt, noqa):  # pylint: disable=too-many-arguments
         """Build a PO message."""
         self.filename = filename
         self.line = line
@@ -298,8 +295,7 @@ class PoFile(object):
         }
         self.msgs = []
 
-    # pylint: disable=too-many-arguments
-    def _add_message(self, numline_msgid, fuzzy, fmt, noqa, msg):
+    def _add_message(self, numline_msgid, fuzzy, fmt, noqa, msg):  # pylint: disable=too-many-arguments
         """
         Add a message from PO file in list of messages.
         """
@@ -318,7 +314,7 @@ class PoFile(object):
         self.msgs.append(PoMessage(self.filename, numline_msgid, msg,
                                    self.props['charset'], fuzzy, fmt, noqa))
 
-    def read(self):
+    def read(self):  # pylint: disable=too-many-locals
         """
         Read messages in PO file.
         """

@@ -101,8 +101,7 @@ The script returns:
     return parser
 
 
-# pylint: disable=too-many-branches
-def main():
+def main():  # pylint: disable=too-many-branches
     """Main function."""
     # parse arguments
     parser = msgcheck_parser()

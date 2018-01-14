@@ -34,8 +34,7 @@ def local_path(filename):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 
-# pylint: disable=too-many-public-methods
-class TestMsgCheck(unittest.TestCase):
+class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-methods
     """Tests on msgcheck."""
 
     def test_compilation(self):
