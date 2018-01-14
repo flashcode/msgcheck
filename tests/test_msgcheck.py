@@ -127,8 +127,8 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
         self.assertEqual(replace_formatters('%b', 'python'), '')
         self.assertEqual(replace_formatters('%%', 'python'), '%')
         self.assertEqual(replace_formatters('%.02f', 'python'), '')
-        self.assertEqual(replace_formatters('%(sth)s', 'python'), 'sth')
-        self.assertEqual(replace_formatters('%(sth)02f', 'python'), 'sth')
+        self.assertEqual(replace_formatters('%(sth)s', 'python'), '')
+        self.assertEqual(replace_formatters('%(sth)02f', 'python'), '')
         # str.format()
         conditions = (
             ('First, thou shalt count to {0}',

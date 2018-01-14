@@ -38,7 +38,7 @@ STR_FORMATTERS.update({
     'python': (
         (r'[\%]{2}', '%'),
         (r'\%([.\d]+)?[bcdeEfFgGnosxX]', r''),
-        (r'\%(\(([^)]*)\))([.\d]+)?[bcdeEfFgGnosxX]', r'\g<2>'),
+        (r'\%(\([^)]*\))([.\d]+)?[bcdeEfFgGnosxX]', r''),
         (r'\{([^\:\}]*)?(:[^\}]*)?\}', r''),
     ),
 })
