@@ -6,7 +6,8 @@
 
 == Version 2.9 (under dev)
 
-* remove C printf formatters for spell checking
+* add option "-n" (or "--skip-noqa") to not check "noqa"-commented lines (issue #2, issue #7)
+* remove C and Python string formatters for spell checking (issue #3)
 
 == Version 2.8 (2014-12-07)
 
