@@ -48,6 +48,7 @@ msgstr "Test 2 sur deux lignes.\nLigne 2.\nLigne 3."
 msgid "Tested 1."
 msgstr "Testé 1"
 
+#, noqa
 msgid "Tested 2"
 msgstr "Testé 2."
 
