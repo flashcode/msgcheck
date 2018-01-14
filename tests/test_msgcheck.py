@@ -120,24 +120,26 @@ class TestMsgCheck(unittest.TestCase):
         self.assertEqual(replace_formatters('%(sth)s', 'python'), 'sth')
         self.assertEqual(replace_formatters('%(sth)02f', 'python'), 'sth')
         # str.format()
-        conditions = [
-            (
-                'First, thou shalt count to {0}', 'First, thou shalt count to ',
-                'References first positional argument'),
-            (
-                'Bring me a {}', 'Bring me a ',
-                'Implicitly references the first positional argument'),
-            ('From {} to {}', 'From  to ', 'Same as "From {0} to {1}"'),
-            (
-                'My quest is {name}', 'My quest is ',
-                'References keyword argument \'name\''),
-            (
-                'Weight in tons {0.weight}', 'Weight in tons ',
-                '\'weight\' attribute of first positional arg'),
-            (
-                'Units destroyed: {players[0]}', 'Units destroyed: ',
-                'First element of keyword argument \'players\'.'),
-        ]
+        conditions = (
+            ('First, thou shalt count to {0}',
+             'First, thou shalt count to ',
+             'References first positional argument'),
+            ('Bring me a {}',
+             'Bring me a ',
+             'Implicitly references the first positional argument'),
+            ('From {} to {}',
+             'From  to ',
+             'Same as "From {0} to {1}"'),
+            ('My quest is {name}',
+             'My quest is ',
+             'References keyword argument \'name\''),
+            ('Weight in tons {0.weight}',
+             'Weight in tons ',
+             '\'weight\' attribute of first positional arg'),
+            ('Units destroyed: {players[0]}',
+             'Units destroyed: ',
+             'First element of keyword argument \'players\'.'),
+        )
         for condition in conditions:
             self.assertEqual(
                 replace_formatters(condition[0], 'python'),
