@@ -160,7 +160,33 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
     def test_spelling_id(self):
         """Test spelling on source messages (English) of gettext files."""
         po_check = PoCheck()
-        po_check.set_spelling_options('id', None, local_path('pwl.txt'))
+        pwl_files = [local_path('pwl1.txt')]
+        po_check.set_spelling_options('id', None, pwl_files)
+        result = po_check.check_files([local_path('fr_spelling_id.po')])
+
+        # be sure we have 1 file in result
+        self.assertEqual(len(result), 1)
+
+        # the file has 2 spelling errors: "Thsi" and "errro"
+        errors = result[0][1]
+        self.assertEqual(len(errors), 3)
+        for i, word in enumerate(('Thsi', 'testtwo', 'errro')):
+            self.assertEqual(errors[i].idmsg, 'spelling-id')
+            self.assertTrue(isinstance(errors[i].message, list))
+            self.assertEqual(len(errors[i].message), 1)
+            self.assertEqual(errors[i].message[0], word)
+
+    def test_spelling_id_multilpe_pwl(self):
+        """
+        Test spelling on source messages (English) of gettext files
+        using multiple personal word lists.
+        """
+        po_check = PoCheck()
+        pwl_files = [
+            local_path('pwl1.txt'),
+            local_path('pwl2.txt'),
+        ]
+        po_check.set_spelling_options('id', None, pwl_files)
         result = po_check.check_files([local_path('fr_spelling_id.po')])
 
         # be sure we have 1 file in result
@@ -178,7 +204,39 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
     def test_spelling_str(self):
         """Test spelling on translated messages of gettext files."""
         po_check = PoCheck()
-        po_check.set_spelling_options('str', None, local_path('pwl.txt'))
+        pwl_files = [local_path('pwl1.txt')]
+        po_check.set_spelling_options('str', None, pwl_files)
+        result = po_check.check_files([local_path('fr_spelling_str.po'),
+                                       local_path('fr_language.po')])
+
+        # be sure we have 2 files in result
+        self.assertEqual(len(result), 2)
+
+        # first file has 3 spelling errors: "CecX", "aabbcc" and "xxyyzz"
+        errors = result[0][1]
+        self.assertEqual(len(errors), 4)
+        for i, word in enumerate(('testtwo', 'CecX', 'aabbcc', 'xxyyzz')):
+            self.assertEqual(errors[i].idmsg, 'spelling-str')
+            self.assertTrue(isinstance(errors[i].message, list))
+            self.assertEqual(len(errors[i].message), 1)
+            self.assertEqual(errors[i].message[0], word)
+
+        # second file has 1 error: dict/language "xyz" not found
+        errors = result[1][1]
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].idmsg, 'dict')
+
+    def test_spelling_str_multiple_pwl(self):
+        """
+        Test spelling on translated messages of gettext files
+        using multiple personal word lists.
+        """
+        po_check = PoCheck()
+        pwl_files = [
+            local_path('pwl1.txt'),
+            local_path('pwl2.txt'),
+        ]
+        po_check.set_spelling_options('str', None, pwl_files)
         result = po_check.check_files([local_path('fr_spelling_str.po'),
                                        local_path('fr_language.po')])
 
@@ -209,8 +267,8 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
         """Test spelling with a bad pwl option."""
         po_check = PoCheck()
         try:
-            po_check.set_spelling_options('str', None,
-                                          local_path('pwl_does_not_exist.txt'))
+            pwl_files = [local_path('pwl_does_not_exist.txt')]
+            po_check.set_spelling_options('str', None, pwl_files)
         except IOError:
             pass  # this exception is expected
         else:

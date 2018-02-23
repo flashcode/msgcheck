@@ -76,9 +76,10 @@ The script returns:
     parser.add_argument('-d', '--dicts',
                         help='comma-separated list of extra dictionaries '
                         'to use (in addition to file language)')
-    parser.add_argument('-P', '--pwl',
-                        help='file with personal list of words used when '
-                        'checking spelling')
+    parser.add_argument('-P', '--pwl', action='append',
+                        help='file(s) with personal list of words used when '
+                        'checking spelling (this option can be given multiple '
+                        'times)')
     parser.add_argument('-m', '--only-misspelled', action='store_true',
                         help='display only misspelled words (no error, '
                         'line number and translation)')

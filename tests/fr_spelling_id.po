@@ -36,8 +36,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, c-format
-msgid "%.3fThsi is a test.\n"
-msgstr "%.3fCeci est un test.\n"
+msgid "%.3fThsi is a testone.\n"
+msgstr "%.3fCeci est un testone.\n"
+
+#, c-format
+msgid "%.3fThis is a testtwo.\n"
+msgstr "%.3fCeci est un testtwo.\n"
 
 msgid "Test 1"
 msgstr "Test 1"

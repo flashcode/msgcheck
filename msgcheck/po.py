@@ -29,6 +29,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 
 # enchant module is optional, spelling is checked on demand
 # (argument -s/--spell)
@@ -40,6 +41,19 @@ except ImportError:
     ENCHANT_FOUND = False
 
 from . utils import count_lines, replace_formatters
+
+
+def build_temp_file_concat_files(filenames):
+    """Build a temporary file with concatenation of multiple files."""
+    if not filenames:
+        return None
+    tmp_file = tempfile.NamedTemporaryFile()
+    for filename in filenames:
+        if not os.path.isfile(filename):
+            raise IOError('file "{0}" not found'.format(filename))
+        tmp_file.write(open(filename, 'rb').read())
+    tmp_file.flush()
+    return tmp_file
 
 
 class PoReport(object):  # pylint: disable=too-few-public-methods
@@ -420,15 +434,11 @@ class PoCheck(object):
         if check in self.checks:
             self.checks[check] = bool(state)
 
-    def set_spelling_options(self, spelling, dicts, pwl):
+    def set_spelling_options(self, spelling, dicts, pwl_files):
         """Set spelling options."""
         self.spelling = spelling
         self.dicts = dicts
-        self.pwl = pwl
-
-        # check if pwl file exists
-        if pwl and not os.path.isfile(pwl):
-            raise IOError('pwl file "{0}" not found'.format(pwl))
+        self.pwl = build_temp_file_concat_files(pwl_files)
 
         # build extra checkers with dicts
         self.extra_checkers = []
@@ -454,7 +464,7 @@ class PoCheck(object):
             lang = po_file.props['language'] \
                 if self.spelling == 'str' else 'en'
             try:
-                _dict = DictWithPWL(lang, self.pwl)
+                _dict = DictWithPWL(lang, self.pwl.name if self.pwl else None)
                 checker.append(SpellChecker(_dict))
             except DictNotFoundError:
                 reports.append(PoReport(

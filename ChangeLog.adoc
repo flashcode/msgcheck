@@ -4,6 +4,10 @@
 :lang: en
 
 
+== Version 3.0 (under dev)
+
+* add support of multiple personal word list files (multiple options -P/--pwl) (issue #5)
+
 == Version 2.9 (2018-01-15)
 
 * add option "-n" (or "--skip-noqa") to not check "noqa"-commented lines (issue #2, issue #7)
