@@ -18,7 +18,7 @@ image:https://travis-ci.org/flashcode/msgcheck.svg?branch=master["Build Status",
 The script requires:
 
 * Python >= 2.7
-* gettext (for the command `msgfmt` to compile PO files)
+* gettext (for the command `msgfmt`, used to compile PO files)
 * the python module `pyenchant` if spelling is checked (with option `-s`).
 
 == Install
