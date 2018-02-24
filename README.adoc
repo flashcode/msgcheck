@@ -55,8 +55,8 @@ Options:
   `str` = translations)
 * `-d <dicts>`, `--dicts <dicts>`: comma-separated list of extra dictionaries
   to use (in addition to file language)
-* `-P <file>`, `--pwl <file>`: file with personal list of words used when
-  checking spelling
+* `-P <file>`, `--pwl <file>`: file(s) with personal list of words used when
+  checking spelling (this option can be given multiple times)
 * `-m`, `--only-misspelled`: display only misspelled words (no error, line
   number and translation)
 * `-w`, `--no-whitespace`: do not check whitespace at beginning/end of strings
