@@ -129,6 +129,9 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
         self.assertEqual(replace_formatters('%.02f', 'python'), '')
         self.assertEqual(replace_formatters('%(sth)s', 'python'), '')
         self.assertEqual(replace_formatters('%(sth)02f', 'python'), '')
+
+    def test_replace_formatters_python_braces(self):
+        """Test removal of formatters in a python braces string."""
         # str.format()
         conditions = (
             ('First, thou shalt count to {0}',
@@ -152,7 +155,7 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
         )
         for condition in conditions:
             self.assertEqual(
-                replace_formatters(condition[0], 'python'),
+                replace_formatters(condition[0], 'python-brace'),
                 condition[1],
                 condition[2],
             )
