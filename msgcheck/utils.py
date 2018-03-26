@@ -39,6 +39,8 @@ STR_FORMATTERS.update({
         (r'[\%]{2}', '%'),
         (r'\%([.\d]+)?[bcdeEfFgGnosxX]', r''),
         (r'\%(\([^)]*\))([.\d]+)?[bcdeEfFgGnosxX]', r''),
+    ),
+    'python-brace':(
         (r'\{([^\:\}]*)?(:[^\}]*)?\}', r''),
     ),
 })
