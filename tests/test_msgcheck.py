@@ -106,7 +106,7 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
         # the file has 9 errors (`noqa` was skipped)
         self.assertEqual(len(result[0][1]), 9)
 
-    def test_replace_formatters_c(self):
+    def test_replace_fmt_c(self):
         """Test removal of formatters in a C string."""
         self.assertEqual(replace_formatters('%s', 'c'), '')
         self.assertEqual(replace_formatters('%%', 'c'), '%')
@@ -120,7 +120,7 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
             replace_formatters('%.3fTest%s%d%%%.03f%luhere% s', 'c'),
             'Test%here')
 
-    def test_replace_formatters_python(self):
+    def test_replace_fmt_python(self):
         """Test removal of formatters in a python string."""
         # str.__mod__()
         self.assertEqual(replace_formatters('%s', 'python'), '')
@@ -130,7 +130,7 @@ class TestMsgCheck(unittest.TestCase):  # pylint: disable=too-many-public-method
         self.assertEqual(replace_formatters('%(sth)s', 'python'), '')
         self.assertEqual(replace_formatters('%(sth)02f', 'python'), '')
 
-    def test_replace_formatters_python_brace(self):
+    def test_replace_fmt_python_brace(self):
         """Test removal of formatters in a python brace string."""
         # str.format()
         conditions = (
