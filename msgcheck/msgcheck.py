@@ -39,7 +39,7 @@ import sys
 from . po import PoCheck
 
 
-__version__ = '3.0-dev'
+__version__ = '3.0'
 
 
 def msgcheck_version():
