@@ -4,6 +4,10 @@
 :lang: en
 
 
+== Version 3.1 (under dev)
+
+* fix parsing of "noqa" tag in comments (issue #11)
+
 == Version 3.0 (2018-12-14)
 
 * add support of multiple personal word list files (multiple options -P/--pwl) (issue #5)
