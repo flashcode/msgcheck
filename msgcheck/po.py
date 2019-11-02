@@ -350,7 +350,7 @@ class PoFile(object):
                     match = re.search(r'([a-z-]+)-format', line, re.IGNORECASE)
                     fmt = match.group(1) if match else None
                 if line.startswith('#'):
-                    noqa = 'noqa' in line
+                    noqa = noqa or 'noqa' in line
                     continue
                 if line.startswith('msg'):
                     match = re.match(
