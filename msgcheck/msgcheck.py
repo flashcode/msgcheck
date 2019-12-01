@@ -59,7 +59,7 @@ Argument "@file.txt" can be used to read default options in a file.
 
 The script returns:
   0: all files checked are OK (or --extract/--only-misspelled given)
-  n: number of files with errors (1 <= n <= 255)
+  n: number of files with errors (1 ≤ n ≤ 255)
 ''')
     parser.add_argument('-c', '--no-compile', action='store_true',
                         help='do not check compilation of file')

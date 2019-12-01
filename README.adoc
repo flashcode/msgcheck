@@ -72,7 +72,7 @@ options.
 
 The script returns exit code *0* if all files checked are OK
 (0 errors or option `--extract` given) or it returns *N*: number of files with
-errors (1 <= N <= 255).
+errors (1 ≤ N ≤ 255).
 
 == Example
 
