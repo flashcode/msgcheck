@@ -135,7 +135,7 @@ def msgcheck_check_files(args):
 def msgcheck_display_errors(args, result):
     """Display error messages."""
     files_ok, files_with_errors, total_errors = 0, 0, 0
-    for filename, reports in result:
+    for _, reports in result:
         if not reports:
             files_ok += 1
             continue
