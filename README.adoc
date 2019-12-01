@@ -3,7 +3,7 @@
 :email: flashcode@flashtux.org
 :lang: en
 
-image:https://travis-ci.org/flashcode/msgcheck.svg?branch=master["Build Status", link="https://travis-ci.org/flashcode/msgcheck"]
+image:https://github.com/flashcode/msgcheck/workflows/Tests/badge.svg["Tests", link="https://github.com/flashcode/msgcheck/actions"]
 
 `msgcheck` performs various checks on gettext files (with extension ".po"):
 
