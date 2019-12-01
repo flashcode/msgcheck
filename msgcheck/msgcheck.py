@@ -102,16 +102,17 @@ The script returns:
     return parser
 
 
-def main():  # pylint: disable=too-many-branches
-    """Main function."""
-    # parse arguments
-    parser = msgcheck_parser()
+def msgcheck_args(parser):
+    """Return msgcheck options."""
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
-    args = parser.parse_args(
+    return parser.parse_args(
         shlex.split(os.getenv('MSGCHECK_OPTIONS') or '') + sys.argv[1:])
 
+
+def msgcheck_check_files(args):
+    """Check files."""
     # create checker and set boolean options
     po_check = PoCheck()
     for option in ('no_compile', 'fuzzy', 'skip_noqa', 'no_lines', 'no_punct',
@@ -128,7 +129,11 @@ def main():  # pylint: disable=too-many-branches
         print('FATAL:', exc, sep=' ')
         sys.exit(1)
 
-    # display error messages
+    return result
+
+
+def msgcheck_display_errors(args, result):
+    """Display error messages."""
     files_ok, files_with_errors, total_errors = 0, 0, 0
     for filename, reports in result:
         if not reports:
@@ -146,6 +151,14 @@ def main():  # pylint: disable=too-many-branches
                                        key=lambda s: s.lower())))
             else:
                 print('\n'.join([str(report) for report in reports]))
+    return files_ok, files_with_errors, total_errors
+
+
+def msgcheck_display_result(args, result):
+    """Display result and return the number of files with errors."""
+    # display errors
+    files_ok, files_with_errors, total_errors = \
+        msgcheck_display_errors(args, result)
 
     # exit now if we extracted translations or if we displayed only
     # misspelled words
@@ -174,6 +187,14 @@ def main():  # pylint: disable=too-many-branches
             print('TOTAL: {0} files OK, {1} files with {2} errors'.format(
                 files_ok, files_with_errors, total_errors))
 
+    return files_with_errors
+
+
+def main():  # pylint: disable=too-many-branches
+    """Main function."""
+    args = msgcheck_args(msgcheck_parser())
+    result = msgcheck_check_files(args)
+    files_with_errors = msgcheck_display_result(args, result)
     sys.exit(min(files_with_errors, 255))
 
 
