@@ -22,5 +22,5 @@
 Gettext file checker.
 """
 
-from . import msgcheck
-from . import po
+from . import msgcheck  # noqa: F401
+from . import po  # noqa: F401
