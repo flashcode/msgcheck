@@ -40,7 +40,7 @@ STR_FORMATTERS.update({
         (r'\%([.\d]+)?[bcdeEfFgGnosxX]', r''),
         (r'\%(\([^)]*\))([.\d]+)?[bcdeEfFgGnosxX]', r''),
     ),
-    'python-brace':(
+    'python-brace': (
         (r'\{([^\:\}]*)?(:[^\}]*)?\}', r''),
     ),
 })
