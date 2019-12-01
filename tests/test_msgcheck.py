@@ -66,7 +66,7 @@ def test_checks():
     assert len(result) == 2
 
     # first file has no errors
-    assert len(result[0][1]) == 0
+    assert not result[0][1]
 
     # second file has 10 errors
     assert len(result[1][1]) == 10
@@ -264,7 +264,7 @@ def test_spelling_bad_dict():
     """Test spelling with a bad dict option."""
     po_check = PoCheck()
     po_check.set_spelling_options('str', 'xxx', None)
-    assert len(po_check.extra_checkers) == 0
+    assert not po_check.extra_checkers
 
 
 def test_spelling_bad_pwl():
