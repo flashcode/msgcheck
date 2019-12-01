@@ -294,6 +294,74 @@ class PoMessage(object):
         return errors
 
 
+class Checker(object):
+    """Messages checker."""
+
+    def __init__(self):
+        self.numline = 0
+        self.numline_msgid = 0
+        self.fuzzy = False,
+        self.msgfuzzy = False
+        self.noqa = False
+        self.msgnoqa = False
+        self.fmt = None
+        self.msgfmt = None
+        self.msg = {}
+        self.msgcurrent = ''
+
+    def check_line(self, line):
+        message = None
+        self.numline += 1
+        if not line:
+            return None
+        if line.startswith('#,'):
+            self.fuzzy = 'fuzzy' in line
+            match = re.search(r'([a-z-]+)-format', line, re.IGNORECASE)
+            self.fmt = match.group(1) if match else None
+        if line.startswith('#'):
+            self.noqa = self.noqa or 'noqa' in line
+            return None
+        if line.startswith('msg'):
+            match = re.match(
+                r'([a-zA-Z0-9-_]+(\[\d+\])?)[ \t](.*)',
+                line)
+            if match:
+                self.oldmsgcurrent = self.msgcurrent
+                self.msgcurrent = match.group(1)
+                line = match.group(3)
+                if self.msgcurrent == 'msgid':
+                    if self.oldmsgcurrent.startswith('msgstr'):
+                        message = (
+                            self.numline_msgid,
+                            self.msgfuzzy,
+                            self.msgfmt,
+                            self.msgnoqa,
+                            self.msg,
+                        )
+                    self.msgfuzzy = self.fuzzy
+                    self.msgnoqa = self.noqa
+                    self.fuzzy = False
+                    self.noqa = False
+                    self.msgfmt = self.fmt
+                    self.fmt = None
+                    self.msg = {}
+                    self.numline_msgid = self.numline
+        if self.msgcurrent and line.startswith('"'):
+            self.msg[self.msgcurrent] = (self.msg.get(self.msgcurrent, '') +
+                                         line[1:-1])
+        return message
+
+    def last_check(self):
+        if self.msgcurrent.startswith('msgstr'):
+            return (
+                self.numline_msgid,
+                self.msgfuzzy,
+                self.msgfmt,
+                self.msgnoqa,
+                self.msg,
+            )
+
+
 class PoFile(object):
     """
     A gettext file. It includes methods to read the file, and perform
@@ -333,56 +401,15 @@ class PoFile(object):
         Read messages in PO file.
         """
         self.msgs = []
-        numline, numline_msgid = (0, 0)
-        fuzzy, msgfuzzy = (False, False)
-        noqa, msgnoqa = (False, False)
-        fmt, msgfmt = (None, None)
-        msg = {}
-        msgcurrent = ''
+        checker = Checker()
         with open(self.filename, 'r') as po_file:
             for line in po_file:
-                numline += 1
-                line = line.strip()
-                if not line:
-                    continue
-                if line.startswith('#,'):
-                    fuzzy = 'fuzzy' in line
-                    match = re.search(r'([a-z-]+)-format', line, re.IGNORECASE)
-                    fmt = match.group(1) if match else None
-                if line.startswith('#'):
-                    noqa = noqa or 'noqa' in line
-                    continue
-                if line.startswith('msg'):
-                    match = re.match(
-                        r'([a-zA-Z0-9-_]+(\[\d+\])?)[ \t](.*)',
-                        line)
-                    if match:
-                        oldmsgcurrent = msgcurrent
-                        msgcurrent = match.group(1)
-                        line = match.group(3)
-                        if msgcurrent == 'msgid':
-                            if oldmsgcurrent.startswith('msgstr'):
-                                self._add_message(numline_msgid,
-                                                  msgfuzzy,
-                                                  msgfmt,
-                                                  msgnoqa,
-                                                  msg)
-                            msgfuzzy = fuzzy
-                            msgnoqa = noqa
-                            fuzzy = False
-                            noqa = False
-                            msgfmt = fmt
-                            fmt = None
-                            msg = {}
-                            numline_msgid = numline
-                if msgcurrent and line.startswith('"'):
-                    msg[msgcurrent] = msg.get(msgcurrent, '') + line[1:-1]
-            if msgcurrent.startswith('msgstr'):
-                self._add_message(numline_msgid,
-                                  msgfuzzy,
-                                  msgfmt,
-                                  msgnoqa,
-                                  msg)
+                message = checker.check_line(line.strip())
+                if message:
+                    self._add_message(*message)
+        message = checker.last_check()
+        if message:
+            self._add_message(*message)
 
     def compile(self):
         """
