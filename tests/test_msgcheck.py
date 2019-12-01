@@ -199,7 +199,7 @@ def test_spelling_id_multilpe_pwl():
         assert errors[i].idmsg == 'spelling-id'
         assert isinstance(errors[i].message, list)
         assert len(errors[i].message) == 1
-        assert errors[i].message[0] ==word
+        assert errors[i].message[0] == word
 
 
 def test_spelling_str():
