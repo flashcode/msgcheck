@@ -480,6 +480,25 @@ class PoCheck(object):
                 checker = []
         return checker
 
+    def check_msg(self, po_file, checker, msg, reports):
+        """Check one message."""
+        if self.checks['extract']:
+            for mid, mstr in msg.messages:
+                if mid and mstr:
+                    reports.append(PoReport(mstr, 'extract'))
+        else:
+            if self.checks['lines']:
+                reports += msg.check_lines()
+            if self.checks['punct']:
+                reports += msg.check_punct(po_file.props['language'])
+            if self.checks['whitespace']:
+                reports += msg.check_whitespace()
+            if self.checks['whitespace_eol']:
+                reports += msg.check_whitespace_eol()
+            if self.spelling:
+                reports += msg.check_spelling(self.spelling, checker +
+                                              self.extra_checkers)
+
     def check_pofile(self, po_file):
         """
         Check translations in one PO file.
@@ -499,22 +518,7 @@ class PoCheck(object):
                 continue
             if msg.fuzzy and not check_fuzzy:
                 continue
-            if self.checks['extract']:
-                for mid, mstr in msg.messages:
-                    if mid and mstr:
-                        reports.append(PoReport(mstr, 'extract'))
-            else:
-                if self.checks['lines']:
-                    reports += msg.check_lines()
-                if self.checks['punct']:
-                    reports += msg.check_punct(po_file.props['language'])
-                if self.checks['whitespace']:
-                    reports += msg.check_whitespace()
-                if self.checks['whitespace_eol']:
-                    reports += msg.check_whitespace_eol()
-                if self.spelling:
-                    reports += msg.check_spelling(
-                        self.spelling, checker + self.extra_checkers)
+            self.check_msg(po_file, checker, msg, reports)
 
         return reports
 
