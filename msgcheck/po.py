@@ -294,13 +294,13 @@ class PoMessage(object):
         return errors
 
 
-class Checker(object):
+class Checker(object):  # pylint: disable=too-many-instance-attributes
     """Messages checker."""
 
     def __init__(self):
         self.numline = 0
         self.numline_msgid = 0
-        self.fuzzy = False,
+        self.fuzzy = False
         self.msgfuzzy = False
         self.noqa = False
         self.msgnoqa = False
@@ -308,8 +308,10 @@ class Checker(object):
         self.msgfmt = None
         self.msg = {}
         self.msgcurrent = ''
+        self.oldmsgcurrent = ''
 
     def check_line(self, line):
+        """Check a line of a PO file."""
         message = None
         self.numline += 1
         if not line:
@@ -352,6 +354,7 @@ class Checker(object):
         return message
 
     def last_check(self):
+        """Consume the last message (after all lines were read)."""
         if self.msgcurrent.startswith('msgstr'):
             return (
                 self.numline_msgid,
@@ -360,6 +363,7 @@ class Checker(object):
                 self.msgnoqa,
                 self.msg,
             )
+        return None
 
 
 class PoFile(object):
