@@ -64,6 +64,7 @@ Options:
   strings
 * `-e`, `--extract`: display all translations and exit (all checks except
   compilation are disabled in this mode)
+* `-i`, `--ignore-errors`: display but ignore errors (always return 0)
 * `-q`, `--quiet`: quiet mode: only display number of errors
 * `-v`, `--version`: display version and exit
 
