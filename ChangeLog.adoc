@@ -8,6 +8,7 @@
 
 * fix parsing of "noqa" tag in comments (issue #11)
 * use pytest for unit tests
+* replace Travis CI by GitHub Actions
 
 == Version 3.0 (2018-12-14)
 
