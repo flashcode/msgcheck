@@ -58,7 +58,8 @@ Environment variable "MSGCHECK_OPTIONS" can be set with default options.
 Argument "@file.txt" can be used to read default options in a file.
 
 The script returns:
-  0: all files checked are OK (or --extract/--only-misspelled given)
+  0: all files checked are OK (or one of these options given:
+     --extract, --only-misspelled or --ignore-errors given)
   n: number of files with errors (1 ≤ n ≤ 255)
 ''')
     parser.add_argument('-c', '--no-compile', action='store_true',
@@ -93,6 +94,8 @@ The script returns:
                         help='display all translations and exit '
                         '(all checks except compilation are disabled in '
                         'this mode)')
+    parser.add_argument('-i', '--ignore-errors', action='store_true',
+                        help='display but ignore errors (always return 0)')
     parser.add_argument('-q', '--quiet', action='store_true',
                         help='quiet mode: only display number of errors')
     parser.add_argument('-v', '--version', action='version',
@@ -195,7 +198,7 @@ def main():  # pylint: disable=too-many-branches
     args = msgcheck_args(msgcheck_parser())
     result = msgcheck_check_files(args)
     files_with_errors = msgcheck_display_result(args, result)
-    sys.exit(min(files_with_errors, 255))
+    sys.exit(0 if args.ignore_errors else min(files_with_errors, 255))
 
 
 if __name__ == "__main__":

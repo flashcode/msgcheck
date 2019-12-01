@@ -6,6 +6,7 @@
 
 == Version 3.1 (under dev)
 
+* add option "-i" (or "--ignore-errors"): always return 0 even if errors are found
 * fix parsing of "noqa" tag in comments (issue #11)
 * use pytest for unit tests
 * replace Travis CI by GitHub Actions
