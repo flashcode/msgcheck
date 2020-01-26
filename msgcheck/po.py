@@ -59,7 +59,8 @@ def build_temp_file_concat_files(filenames):
 class PoReport(object):  # pylint: disable=too-few-public-methods
     """A message in report (commonly an error in detected in gettext file)."""
 
-    def __init__(self, message, idmsg='', filename='-', line=0, mid='',  # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments
+    def __init__(self, message, idmsg='', filename='-', line=0, mid='',
                  mstr='', fuzzy=False):
         self.message = message
         self.idmsg = idmsg
@@ -121,7 +122,8 @@ class PoMessage(object):
               ('%d files found', '%d fichiers trouvés')]
     """
 
-    def __init__(self, filename, line, msg, charset, fuzzy, fmt, noqa):  # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments
+    def __init__(self, filename, line, msg, charset, fuzzy, fmt, noqa):
         """Build a PO message."""
         self.filename = filename
         self.line = line
@@ -381,7 +383,8 @@ class PoFile(object):
         }
         self.msgs = []
 
-    def _add_message(self, numline_msgid, fuzzy, fmt, noqa, msg):  # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments
+    def _add_message(self, numline_msgid, fuzzy, fmt, noqa, msg):
         """
         Add a message from PO file in list of messages.
         """
