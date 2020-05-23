@@ -4,7 +4,7 @@
 :lang: en
 
 image:https://img.shields.io/pypi/v/msgcheck.svg["PyPI", link="https://pypi.org/project/msgcheck/"]
-image:https://github.com/flashcode/msgcheck/workflows/Tests/badge.svg["Tests", link="https://github.com/flashcode/msgcheck/actions"]
+image:https://github.com/flashcode/msgcheck/workflows/CI/badge.svg["CI", link="https://github.com/flashcode/msgcheck/actions"]
 
 `msgcheck` performs various checks on gettext files (with extension ".po"):
 
