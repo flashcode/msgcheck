@@ -44,4 +44,4 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest
+          pytest -vv --cov-report term-missing --cov=msgcheck tests
