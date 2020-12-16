@@ -56,6 +56,46 @@ def test_read():
         PoFile(local_path('fr_does_not_exist.po')).read()
 
 
+def test_extract():
+    """Test extract on a gettext file."""
+    po_check = PoCheck()
+    po_check.set_check('extract', True)
+    result = po_check.check_files([local_path('fr.po')])
+    assert len(result) == 1
+    assert 'fr.po' in result[0][0]
+    assert len(result[0][1]) == 3
+
+    report = result[0][1][0]
+    assert report.message == 'Ceci est un test.\n'
+    assert report.idmsg == 'extract'
+    assert report.filename == '-'
+    assert report.line == 0
+    assert report.mid == ''
+    assert report.mstr == ''
+    assert report.fuzzy is False
+    assert str(report) == 'Ceci est un test.\n\n---'
+
+    report = result[0][1][1]
+    assert report.message == 'Test sur deux lignes.\nLigne 2.'
+    assert report.idmsg == 'extract'
+    assert report.filename == '-'
+    assert report.line == 0
+    assert report.mid == ''
+    assert report.mstr == ''
+    assert report.fuzzy is False
+    assert str(report) == 'Test sur deux lignes.\nLigne 2.\n---'
+
+    report = result[0][1][2]
+    assert report.message == ' erreur : %s'
+    assert report.idmsg == 'extract'
+    assert report.filename == '-'
+    assert report.line == 0
+    assert report.mid == ''
+    assert report.mstr == ''
+    assert report.fuzzy is False
+    assert str(report) == ' erreur : %s\n---'
+
+
 def test_checks():
     """Test checks on gettext files."""
     po_check = PoCheck()
