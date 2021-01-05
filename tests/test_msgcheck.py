@@ -24,7 +24,7 @@ import os
 import pytest
 
 from msgcheck.msgcheck import msgcheck_version
-from msgcheck.po import PoFile, PoCheck
+from msgcheck.po import PoFile, PoCheck, PoMessage
 from msgcheck.utils import replace_formatters
 
 
@@ -347,3 +347,30 @@ def test_spelling_bad_pwl():
     with pytest.raises(IOError):
         pwl_files = [local_path('pwl_does_not_exist.txt')]
         po_check.set_spelling_options('str', None, pwl_files)
+
+
+@pytest.mark.parametrize('language, msgid, msgstr, error_message', [
+    ('ja', 'Should not raise an error.', u'エラーが発生しないようにしてください。', ''),
+    ('ja', 'Should raise an error', u'エラーを発生させる必要があります。',
+     u'end punctuation: "。" in translation, "." not in string'),
+    ('ja', 'Should raise an error.', u'エラーを発生させる必要があります',
+     u'end punctuation: "." in string, "。" not in translation'),
+    ('ja', 'Should raise an error.', u'エラーを発生させる必要があります.',
+     u'end punctuation: "." in string, "。" not in translation'),
+    ('zh-Hans', 'Should not raise an error.', u'不应引起错误。', ''),
+    ('zh-Hans', 'Should raise an error', u'应该会出现一个错误。',
+     u'end punctuation: "。" in translation, "." not in string'),
+    ('zh-Hans', 'Should raise an error.', u'应该会出现一个错误',
+     u'end punctuation: "." in string, "。" not in translation'),
+    ('zh-Hans', 'Should raise an error.', u'应该会出现一个错误.',
+     u'end punctuation: "." in string, "。" not in translation'),
+])
+def test_check_punct__full_stop__ja_zh(language, msgid, msgstr, error_message):
+    """Test punctuation with non-latin full-stops."""
+    msg = PoMessage('translation.po', 42, {}, 'utf-8', False, False, False)
+    msg.messages = [(msgid, msgstr)]
+    errors = PoMessage.check_punct(msg, language)
+    if error_message:
+        assert error_message in errors[0].message
+    else:
+        assert not errors
