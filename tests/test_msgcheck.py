@@ -18,13 +18,12 @@
 # along with msgcheck.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-"""
-Tests on msgcheck.
-"""
+"""Tests on msgcheck."""
 
 import os
 import pytest
 
+from msgcheck.msgcheck import msgcheck_version
 from msgcheck.po import PoFile, PoCheck
 from msgcheck.utils import replace_formatters
 
@@ -32,6 +31,12 @@ from msgcheck.utils import replace_formatters
 def local_path(filename):
     """Return path to a file in the "tests" directory."""
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+
+
+def test_version():
+    """Test msgcheck version."""
+    version = msgcheck_version()
+    assert len(version.split('.')) > 1
 
 
 def test_compilation():
@@ -110,6 +115,31 @@ def test_checks():
 
     # second file has 10 errors
     assert len(result[1][1]) == 10
+
+    # check first error
+    report = result[1][1][0]
+    assert report.message == 'number of lines: 2 in string, 1 in translation'
+    assert report.idmsg == 'lines'
+    assert 'fr_errors.po' in report.filename
+    assert report.line == 42
+    assert report.mid == 'Test 1 on two lines.\nLine 2.'
+    assert report.mstr == 'Test 1 sur deux lignes.'
+    assert report.fuzzy is False
+    assert ('fr_errors.po:42: [lines] number of lines: '
+            '2 in string, 1 in translation' in str(report))
+
+    # check last error
+    report = result[1][1][9]
+    assert report.message == \
+        'different whitespace at end of a line: 1 in string, 0 in translation'
+    assert report.idmsg == 'whitespace_eol'
+    assert 'fr_errors.po' in report.filename
+    assert report.line == 74
+    assert report.mid == 'Line 1. \nLine 2.'
+    assert report.mstr == 'Ligne 1.\nLigne 2.'
+    assert report.fuzzy is False
+
+    # check number of errors by type
     errors = {}
     for report in result[1][1]:
         errors[report.idmsg] = errors.get(report.idmsg, 0) + 1
@@ -207,13 +237,14 @@ def test_spelling_id():
     assert len(result) == 1
 
     # the file has 2 spelling errors: "Thsi" and "errro"
-    errors = result[0][1]
-    assert len(errors) == 3
+    report = result[0][1]
+    assert len(report) == 3
     for i, word in enumerate(('Thsi', 'testtwo', 'errro')):
-        assert errors[i].idmsg == 'spelling-id'
-        assert isinstance(errors[i].message, list)
-        assert len(errors[i].message) == 1
-        assert errors[i].message[0] == word
+        assert report[i].idmsg == 'spelling-id'
+        assert isinstance(report[i].message, list)
+        assert len(report[i].message) == 1
+        assert report[i].message[0] == word
+        assert report[i].get_misspelled_words() == [word]
 
 
 def test_spelling_id_multilpe_pwl():
@@ -233,13 +264,14 @@ def test_spelling_id_multilpe_pwl():
     assert len(result) == 1
 
     # the file has 2 spelling errors: "Thsi" and "errro"
-    errors = result[0][1]
-    assert len(errors) == 2
+    report = result[0][1]
+    assert len(report) == 2
     for i, word in enumerate(('Thsi', 'errro')):
-        assert errors[i].idmsg == 'spelling-id'
-        assert isinstance(errors[i].message, list)
-        assert len(errors[i].message) == 1
-        assert errors[i].message[0] == word
+        assert report[i].idmsg == 'spelling-id'
+        assert isinstance(report[i].message, list)
+        assert len(report[i].message) == 1
+        assert report[i].message[0] == word
+        assert report[i].get_misspelled_words() == [word]
 
 
 def test_spelling_str():
@@ -254,18 +286,19 @@ def test_spelling_str():
     assert len(result) == 2
 
     # first file has 3 spelling errors: "CecX", "aabbcc" and "xxyyzz"
-    errors = result[0][1]
-    assert len(errors) == 4
+    report = result[0][1]
+    assert len(report) == 4
     for i, word in enumerate(('testtwo', 'CecX', 'aabbcc', 'xxyyzz')):
-        assert errors[i].idmsg == 'spelling-str'
-        assert isinstance(errors[i].message, list)
-        assert len(errors[i].message) == 1
-        assert errors[i].message[0] == word
+        assert report[i].idmsg == 'spelling-str'
+        assert isinstance(report[i].message, list)
+        assert len(report[i].message) == 1
+        assert report[i].message[0] == word
+        assert report[i].get_misspelled_words() == [word]
 
     # second file has 1 error: dict/language "xyz" not found
-    errors = result[1][1]
-    assert len(errors) == 1
-    assert errors[0].idmsg == 'dict'
+    report = result[1][1]
+    assert len(report) == 1
+    assert report[0].idmsg == 'dict'
 
 
 def test_spelling_str_multiple_pwl():
@@ -286,18 +319,19 @@ def test_spelling_str_multiple_pwl():
     assert len(result) == 2
 
     # first file has 3 spelling errors: "CecX", "aabbcc" and "xxyyzz"
-    errors = result[0][1]
-    assert len(errors) == 3
+    report = result[0][1]
+    assert len(report) == 3
     for i, word in enumerate(('CecX', 'aabbcc', 'xxyyzz')):
-        assert errors[i].idmsg == 'spelling-str'
-        assert isinstance(errors[i].message, list)
-        assert len(errors[i].message) == 1
-        assert errors[i].message[0] == word
+        assert report[i].idmsg == 'spelling-str'
+        assert isinstance(report[i].message, list)
+        assert len(report[i].message) == 1
+        assert report[i].message[0] == word
+        assert report[i].get_misspelled_words() == [word]
 
     # second file has 1 error: dict/language "xyz" not found
-    errors = result[1][1]
-    assert len(errors) == 1
-    assert errors[0].idmsg == 'dict'
+    report = result[1][1]
+    assert len(report) == 1
+    assert report[0].idmsg == 'dict'
 
 
 def test_spelling_bad_dict():
