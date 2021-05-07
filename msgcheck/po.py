@@ -43,17 +43,15 @@ except ImportError:
 from . utils import count_lines, replace_formatters
 
 
-def build_temp_file_concat_files(filenames):
-    """Build a temporary file with concatenation of multiple files."""
+def get_concatenated_files(filenames):
+    """Return concatenated content of multiple files."""
     if not filenames:
         return None
-    with tempfile.NamedTemporaryFile() as tmp_file:
-        for filename in filenames:
-            if not os.path.isfile(filename):
-                raise IOError('file "{0}" not found'.format(filename))
-            tmp_file.write(open(filename, 'rb').read())
-        tmp_file.flush()
-        return tmp_file
+    content = []
+    for filename in filenames:
+        with open(filename, 'rb') as _file:
+            content.append(_file.read().decode('utf-8'))
+    return '\n'.join(content)
 
 
 class PoReport(object):  # pylint: disable=too-few-public-methods
@@ -457,11 +455,10 @@ class PoCheck(object):
 
     def __repr__(self):
         return ('checks: {0}, dicts: {1}, '
-                'extra_checkers: {2}, pwl: {3}'.format(
+                'extra_checkers: {2}'.format(
                     self.checks,
                     self.dicts,
-                    self.extra_checkers,
-                    self.pwl))
+                    self.extra_checkers))
 
     def set_check(self, check, state):
         """Enable/disable a specific check."""
@@ -472,7 +469,7 @@ class PoCheck(object):
         """Set spelling options."""
         self.spelling = spelling
         self.dicts = dicts
-        self.pwl = build_temp_file_concat_files(pwl_files)
+        self.pwl = get_concatenated_files(pwl_files)
 
         # build extra checkers with dicts
         self.extra_checkers = []
@@ -498,8 +495,11 @@ class PoCheck(object):
             lang = po_file.props['language'] \
                 if self.spelling == 'str' else 'en'
             try:
-                _dict = DictWithPWL(lang, self.pwl.name if self.pwl else None)
-                checker.append(SpellChecker(_dict))
+                with tempfile.NamedTemporaryFile() as tmp_file:
+                    tmp_file.write(self.pwl.encode('utf-8'))
+                    tmp_file.flush()
+                    _dict = DictWithPWL(lang, tmp_file.name)
+                    checker.append(SpellChecker(_dict))
             except DictNotFoundError:
                 reports.append(PoReport(
                     'enchant dictionary not found for language "{0}"'
