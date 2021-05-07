@@ -47,13 +47,13 @@ def build_temp_file_concat_files(filenames):
     """Build a temporary file with concatenation of multiple files."""
     if not filenames:
         return None
-    tmp_file = tempfile.NamedTemporaryFile()
-    for filename in filenames:
-        if not os.path.isfile(filename):
-            raise IOError('file "{0}" not found'.format(filename))
-        tmp_file.write(open(filename, 'rb').read())
-    tmp_file.flush()
-    return tmp_file
+    with tempfile.NamedTemporaryFile() as tmp_file:
+        for filename in filenames:
+            if not os.path.isfile(filename):
+                raise IOError('file "{0}" not found'.format(filename))
+            tmp_file.write(open(filename, 'rb').read())
+        tmp_file.flush()
+        return tmp_file
 
 
 class PoReport(object):  # pylint: disable=too-few-public-methods
