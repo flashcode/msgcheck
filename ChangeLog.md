@@ -1,5 +1,9 @@
 # Msgcheck ChangeLog
 
+## Version 3.2.0 (under dev)
+
+- Add support for Chinese full-stop.
+
 ## Version 3.1 (2020-03-07)
 
 - Add option `-i` (or `--ignore-errors`): always return 0 even if errors are found.
