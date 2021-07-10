@@ -365,7 +365,7 @@ def test_spelling_bad_pwl():
     ('zh-Hans', 'Should raise an error.', u'应该会出现一个错误.',
      u'end punctuation: "." in string, "。" not in translation'),
 ])
-def test_check_punct__full_stop__ja_zh(language, msgid, msgstr, error_message):
+def test_punct_full_stop_ja_zh(language, msgid, msgstr, error_message):
     """Test punctuation with non-latin full-stops."""
     msg = PoMessage('translation.po', 42, {}, 'utf-8', False, False, False)
     msg.messages = [(msgid, msgstr)]
