@@ -178,8 +178,8 @@ class PoMessage(object):
                 continue
             puncts = [(':', ':'), (';', ';'), (',', ','), ('...', '...')]
             # special symbols in some languages
-            if language.startswith('ja'):
-                puncts.append(('.', '。'))
+            if language[:2] in ['ja', 'zh']:
+                puncts.append(('.', u'。'))
             else:
                 puncts.append(('.', '.'))
             for punctid, punctstr in puncts:
@@ -193,15 +193,15 @@ class PoMessage(object):
                     break
                 if match_id and not match_str:
                     errors.append(
-                        PoReport('end punctuation: "{0}" in string, '
-                                 '"{1}" not in translation'
+                        PoReport(u'end punctuation: "{0}" in string, '
+                                 u'"{1}" not in translation'
                                  ''.format(punctid, punctstr),
                                  'punct', self.filename, self.line, mid, mstr))
                     break
                 if not match_id and match_str:
                     errors.append(
-                        PoReport('end punctuation: "{0}" in translation, '
-                                 '"{1}" not in string'
+                        PoReport(u'end punctuation: "{0}" in translation, '
+                                 u'"{1}" not in string'
                                  ''.format(punctstr, punctid),
                                  'punct', self.filename, self.line, mid, mstr))
                     break
