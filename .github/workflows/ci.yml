@@ -8,10 +8,11 @@ jobs:
 
   build:
 
-    name: Python ${{ matrix.python-version }}
-    runs-on: ubuntu-20.04
     strategy:
       matrix:
+        os:
+          - ubuntu-20.04
+          - ubuntu-18.04
         python-version:
           - "2.7"
           - "3.5"
@@ -20,6 +21,9 @@ jobs:
           - "3.8"
           - "3.9"
           - "3.10"
+
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
     steps:
 
