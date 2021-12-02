@@ -495,11 +495,14 @@ class PoCheck(object):
             lang = po_file.props['language'] \
                 if self.spelling == 'str' else 'en'
             try:
-                with tempfile.NamedTemporaryFile() as tmp_file:
-                    tmp_file.write(self.pwl.encode('utf-8'))
-                    tmp_file.flush()
-                    _dict = DictWithPWL(lang, tmp_file.name)
-                    checker.append(SpellChecker(_dict))
+                if self.pwl:
+                    with tempfile.NamedTemporaryFile() as tmp_file:
+                        tmp_file.write(self.pwl.encode('utf-8'))
+                        tmp_file.flush()
+                        _dict = DictWithPWL(lang, tmp_file.name)
+                else:
+                    _dict = DictWithPWL(lang, None)
+                checker.append(SpellChecker(_dict))
             except DictNotFoundError:
                 reports.append(PoReport(
                     'enchant dictionary not found for language "{0}"'
