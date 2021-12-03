@@ -4,6 +4,7 @@
 
 - Drop Python 2 support, Python 3.6 is now required.
 - Add support for Chinese full-stop.
+- Add lint with bandit in CI.
 
 ## Version 3.1 (2020-03-07)
 

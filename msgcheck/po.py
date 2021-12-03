@@ -25,7 +25,7 @@ from __future__ import print_function
 from codecs import escape_decode
 import os
 import re
-import subprocess
+import subprocess  # nosec
 import tempfile
 
 # enchant module is optional, spelling is checked on demand
@@ -461,7 +461,7 @@ class PoFile(object):
         """
         output = ''
         try:
-            output = subprocess.check_output(
+            output = subprocess.check_output(  # nosec
                 ['msgfmt', '-c', '-o', '/dev/null', self.filename],
                 stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as exc:

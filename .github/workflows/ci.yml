@@ -37,13 +37,16 @@ jobs:
           sudo apt-get install gettext aspell aspell-fr enchant
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install flake8 pylint pytest coverage pytest-cov
+          pip install bandit coverage flake8 pylint pytest pytest-cov
 
       - name: Lint with flake8
         run: make flake8
 
       - name: Lint with pylint
         run: make pylint
+
+      - name: Lint with bandit
+        run: make bandit
 
       - name: Test with pytest
         run: make test
