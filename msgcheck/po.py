@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 #
 # Copyright (C) 2009-2021 Sébastien Helleu <flashcode@flashtux.org>
 #
@@ -18,9 +18,7 @@
 # along with msgcheck.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-"""
-Classes to read and check PO (gettext) files.
-"""
+"""Classes to read and check PO (gettext) files."""
 
 from __future__ import print_function
 
@@ -28,7 +26,6 @@ from codecs import escape_decode
 import os
 import re
 import subprocess
-import sys
 import tempfile
 
 # enchant module is optional, spelling is checked on demand
@@ -72,17 +69,13 @@ class PoReport(object):  # pylint: disable=too-few-public-methods
         if self.idmsg == 'extract':
             return self.message + '\n---'
         if self.idmsg == 'compile':
-            return '{0}\n{1}'.format('=' * 70, self.message)
+            return f'{"=" * 70}\n{self.message}'
         is_list = isinstance(self.message, list)
-        count = '(%d)' % len(self.message) if is_list else ''
-        msg = '{0}\n{1}:{2}: [{3}{4}] {5}{6}'.format(
-            '=' * 70,
-            self.filename,
-            self.line,
-            self.idmsg,
-            count,
-            '(fuzzy) ' if self.fuzzy else '',
-            ', '.join(self.message) if is_list else self.message)
+        count = f'({len(self.message)})' if is_list else ''
+        str_fuzzy = '(fuzzy) ' if self.fuzzy else ''
+        str_msg = ', '.join(self.message) if is_list else self.message
+        msg = (f'{"=" * 70}\n{self.filename}:{self.line}: '
+               f'[{self.idmsg}{count}] {str_fuzzy}{str_msg}')
         if self.mid:
             msg += '\n---\n' + self.mid
         if self.mstr:
@@ -126,19 +119,16 @@ class PoMessage(object):
         self.filename = filename
         self.line = line
         # unescape strings
-        if sys.version_info < (3,):
-            # python 2.x
-            msg = {k: escape_decode(v)[0] for k, v in msg.items()}
-        else:
-            # python 3.x
-            msg = {k: escape_decode(v)[0]. decode(charset)
-                   for k, v in msg.items()}
+        msg = {
+            k: escape_decode(v)[0].decode(charset)
+            for k, v in msg.items()
+        }
         # build messages as a list of tuples: (string, translation)
         self.messages = []
         if 'msgid_plural' in msg:
             i = 0
             while True:
-                key = 'msgstr[{0}]'.format(i)
+                key = f'msgstr[{i}]'
                 if key not in msg:
                     break
                 self.messages.append((msg['msgid_plural'], msg[key]))
@@ -162,9 +152,16 @@ class PoMessage(object):
             nb_str = count_lines(mstr)
             if nb_id != nb_str:
                 errors.append(
-                    PoReport('number of lines: {0} in string, '
-                             '{1} in translation'.format(nb_id, nb_str),
-                             'lines', self.filename, self.line, mid, mstr))
+                    PoReport(
+                        f'number of lines: {nb_id} in string, '
+                        f'{nb_str} in translation',
+                        'lines',
+                        self.filename,
+                        self.line,
+                        mid,
+                        mstr,
+                    )
+                )
         return errors
 
     def check_punct(self, language):
@@ -176,10 +173,15 @@ class PoMessage(object):
         for mid, mstr in self.messages:
             if not mid or not mstr:
                 continue
-            puncts = [(':', ':'), (';', ';'), (',', ','), ('...', '...')]
+            puncts = [
+                (':', ':'),
+                (';', ';'),
+                (',', ','),
+                ('...', '...'),
+            ]
             # special symbols in some languages
             if language[:2] in ['ja', 'zh']:
-                puncts.append(('.', u'。'))
+                puncts.append(('.', '。'))
             else:
                 puncts.append(('.', '.'))
             for punctid, punctstr in puncts:
@@ -193,17 +195,29 @@ class PoMessage(object):
                     break
                 if match_id and not match_str:
                     errors.append(
-                        PoReport(u'end punctuation: "{0}" in string, '
-                                 u'"{1}" not in translation'
-                                 ''.format(punctid, punctstr),
-                                 'punct', self.filename, self.line, mid, mstr))
+                        PoReport(
+                            f'end punctuation: "{punctid}" in string, '
+                            f'"{punctstr}" not in translation',
+                            'punct',
+                            self.filename,
+                            self.line,
+                            mid,
+                            mstr,
+                        )
+                    )
                     break
                 if not match_id and match_str:
                     errors.append(
-                        PoReport(u'end punctuation: "{0}" in translation, '
-                                 u'"{1}" not in string'
-                                 ''.format(punctstr, punctid),
-                                 'punct', self.filename, self.line, mid, mstr))
+                        PoReport(
+                            f'end punctuation: "{punctstr}" in '
+                            f'translation, "{punctid}" not in string',
+                            'punct',
+                            self.filename,
+                            self.line,
+                            mid,
+                            mstr,
+                        )
+                    )
                     break
         return errors
 
@@ -222,20 +236,31 @@ class PoMessage(object):
                 startout = len(mstr) - len(mstr.lstrip(' '))
                 if startin != startout:
                     errors.append(
-                        PoReport('whitespace at beginning: {0} in string, '
-                                 '{1} in translation'
-                                 ''.format(startin, startout),
-                                 'whitespace', self.filename, self.line, mid,
-                                 mstr))
+                        PoReport(
+                            f'whitespace at beginning: {startin} in '
+                            f'string, {startout} in translation',
+                            'whitespace',
+                            self.filename,
+                            self.line,
+                            mid,
+                            mstr,
+                        )
+                    )
             # check whitespace at end of string
             endin = len(mid) - len(mid.rstrip(' '))
             endout = len(mstr) - len(mstr.rstrip(' '))
             if endin != endout:
                 errors.append(
-                    PoReport('whitespace at end: {0} in string, '
-                             '{1} in translation'.format(endin, endout),
-                             'whitespace', self.filename, self.line, mid,
-                             mstr))
+                    PoReport(
+                        f'whitespace at end: {endin} in string, '
+                        f'{endout} in translation',
+                        'whitespace',
+                        self.filename,
+                        self.line,
+                        mid,
+                        mstr,
+                    )
+                )
         return errors
 
     def check_whitespace_eol(self):
@@ -256,11 +281,16 @@ class PoMessage(object):
                 endout = len(strlines[i]) - len(strlines[i].rstrip(' '))
                 if (endin > 0 or endout > 0) and endin != endout:
                     errors.append(
-                        PoReport('different whitespace at end of a line: {0} '
-                                 'in string, {1} in translation'
-                                 ''.format(endin, endout),
-                                 'whitespace_eol', self.filename, self.line,
-                                 mid, mstr))
+                        PoReport(
+                            f'different whitespace at end of a line: {endin} '
+                            f'in string, {endout} in translation',
+                            'whitespace_eol',
+                            self.filename,
+                            self.line,
+                            mid,
+                            mstr,
+                        )
+                    )
                     break
         return errors
 
@@ -289,8 +319,16 @@ class PoMessage(object):
                 if misspelled_word:
                     misspelled.append(err.word)
             if misspelled:
-                errors.append(PoReport(misspelled, 'spelling-' + spelling,
-                                       self.filename, self.line, mid, mstr))
+                errors.append(
+                    PoReport(
+                        misspelled,
+                        'spelling-' + spelling,
+                        self.filename,
+                        self.line,
+                        mid,
+                        mstr,
+                    )
+                )
         return errors
 
 
@@ -407,7 +445,7 @@ class PoFile(object):
         """
         self.msgs = []
         checker = Checker()
-        with open(self.filename, 'r') as po_file:
+        with open(self.filename, 'r', encoding='utf-8') as po_file:
             for line in po_file:
                 message = checker.check_line(line.strip())
                 if message:
@@ -454,11 +492,8 @@ class PoCheck(object):
         self.pwl = None
 
     def __repr__(self):
-        return ('checks: {0}, dicts: {1}, '
-                'extra_checkers: {2}'.format(
-                    self.checks,
-                    self.dicts,
-                    self.extra_checkers))
+        return (f'checks: {self.checks}, dicts: {self.dicts}, '
+                f'extra_checkers: {self.extra_checkers}')
 
     def set_check(self, check, state):
         """Enable/disable a specific check."""
@@ -482,8 +517,8 @@ class PoCheck(object):
                     _dict = Dict(lang)
                     self.extra_checkers.append(SpellChecker(_dict))
                 except DictNotFoundError:
-                    print('WARNING: enchant dictionary not found for '
-                          'language "{0}"'.format(lang))
+                    print(f'WARNING: enchant dictionary not found for '
+                          f'language "{lang}"')
 
     def _get_language_checker(self, po_file, reports):
         """Get checker for PO file language."""
@@ -504,11 +539,14 @@ class PoCheck(object):
                     _dict = DictWithPWL(lang, None)
                 checker.append(SpellChecker(_dict))
             except DictNotFoundError:
-                reports.append(PoReport(
-                    'enchant dictionary not found for language "{0}"'
-                    ''.format(lang),
-                    'dict', po_file.filename,
-                    po_file.props['language_numline']))
+                reports.append(
+                    PoReport(
+                        f'enchant dictionary not found for language "{lang}"',
+                        'dict',
+                        po_file.filename,
+                        po_file.props['language_numline']
+                    )
+                )
                 checker = []
             except IOError as exc:
                 reports.append(PoReport(
@@ -586,8 +624,7 @@ class PoCheck(object):
                 result.append((po_file.filename, self.check_pofile(po_file)))
             else:
                 # compilation failed
-                if sys.version_info >= (3,):
-                    compile_output = bytes(compile_output).decode('utf-8')
+                compile_output = bytes(compile_output).decode('utf-8')
                 result.append((po_file.filename,
                                [PoReport(compile_output, 'compile',
                                          po_file.filename)]))

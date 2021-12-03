@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 #
 # Copyright (C) 2009-2021 Sébastien Helleu <flashcode@flashtux.org>
 #
@@ -350,20 +350,54 @@ def test_spelling_bad_pwl():
 
 
 @pytest.mark.parametrize('language, msgid, msgstr, error_message', [
-    ('ja', 'Should not raise an error.', u'エラーが発生しないようにしてください。', ''),
-    ('ja', 'Should raise an error', u'エラーを発生させる必要があります。',
-     u'end punctuation: "。" in translation, "." not in string'),
-    ('ja', 'Should raise an error.', u'エラーを発生させる必要があります',
-     u'end punctuation: "." in string, "。" not in translation'),
-    ('ja', 'Should raise an error.', u'エラーを発生させる必要があります.',
-     u'end punctuation: "." in string, "。" not in translation'),
-    ('zh-Hans', 'Should not raise an error.', u'不应引起错误。', ''),
-    ('zh-Hans', 'Should raise an error', u'应该会出现一个错误。',
-     u'end punctuation: "。" in translation, "." not in string'),
-    ('zh-Hans', 'Should raise an error.', u'应该会出现一个错误',
-     u'end punctuation: "." in string, "。" not in translation'),
-    ('zh-Hans', 'Should raise an error.', u'应该会出现一个错误.',
-     u'end punctuation: "." in string, "。" not in translation'),
+    (
+        'ja',
+        'Should not raise an error.',
+        'エラーが発生しないようにしてください。',
+        '',
+    ),
+    (
+        'ja',
+        'Should raise an error',
+        'エラーを発生させる必要があります。',
+        'end punctuation: "。" in translation, "." not in string',
+    ),
+    (
+        'ja',
+        'Should raise an error.',
+        'エラーを発生させる必要があります',
+        'end punctuation: "." in string, "。" not in translation',
+    ),
+    (
+        'ja',
+        'Should raise an error.',
+        'エラーを発生させる必要があります.',
+        'end punctuation: "." in string, "。" not in translation',
+    ),
+    (
+        'zh-Hans',
+        'Should not raise an error.',
+        '不应引起错误。',
+        '',
+    ),
+    (
+        'zh-Hans',
+        'Should raise an error',
+        '应该会出现一个错误。',
+        'end punctuation: "。" in translation, "." not in string',
+    ),
+    (
+        'zh-Hans',
+        'Should raise an error.',
+        '应该会出现一个错误',
+        'end punctuation: "." in string, "。" not in translation',
+    ),
+    (
+        'zh-Hans',
+        'Should raise an error.',
+        '应该会出现一个错误.',
+        'end punctuation: "." in string, "。" not in translation',
+    ),
 ])
 def test_punct_full_stop_ja_zh(language, msgid, msgstr, error_message):
     """Test punctuation with non-latin full-stops."""

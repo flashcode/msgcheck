@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 #
 # Copyright (C) 2009-2021 Sébastien Helleu <flashcode@flashtux.org>
 #
@@ -18,9 +18,7 @@
 # along with msgcheck.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-"""
-Some utility functions for msgcheck.
-"""
+"""Some utility functions for msgcheck."""
 
 from __future__ import print_function
 

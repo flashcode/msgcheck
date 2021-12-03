@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 #
 # Copyright (C) 2009-2021 Sébastien Helleu <flashcode@flashtux.org>
 #
@@ -174,21 +174,19 @@ def msgcheck_display_result(args, result):
     for filename, reports in result:
         errors = len(reports)
         if errors == 0:
-            print('{0}: OK'.format(filename))
+            print(f'{filename}: OK')
         else:
-            print('{0}: {1} errors ({2})'.format(
-                filename,
-                errors,
-                'almost good!' if errors <= 10 else 'uh oh... try again!'))
+            result = 'almost good!' if errors <= 10 else 'uh oh... try again!'
+            print(f'{filename}: {errors} errors ({result})')
 
     # display total (if many files processed)
     if len(args.file) > 1:
         print('---')
         if files_with_errors == 0:
-            print('TOTAL: {0} files OK'.format(files_ok))
+            print(f'TOTAL: {files_ok} files OK')
         else:
-            print('TOTAL: {0} files OK, {1} files with {2} errors'.format(
-                files_ok, files_with_errors, total_errors))
+            print(f'TOTAL: {files_ok} files OK, {files_with_errors} files '
+                  f'with {total_errors} errors')
 
     return files_with_errors
 
