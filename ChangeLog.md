@@ -1,5 +1,9 @@
 # Msgcheck ChangeLog
 
+## Version 4.1.0 (under dev)
+
+- Use file README.md as package long description.
+
 ## Version 4.0.0 (2022-01-23)
 
 - Drop Python 2 support, Python 3.6 is now required.
