@@ -3,6 +3,7 @@
 ## Version 3.2.0 (under dev)
 
 - Drop Python 2 support, Python 3.6 is now required.
+- Rename option `--skip-noqa` to `--check-noqa` and reverse behavior: without option, strings with `noqa` are now skipped by default.
 - Add support for Chinese full-stop.
 - Add lint with bandit in CI.
 

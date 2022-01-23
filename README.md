@@ -46,7 +46,7 @@ Options:
 - `-h`, `--help`: display help message and exit
 - `-c`, `--no-compile`: do not check compilation of file (with `msgfmt -c`)
 - `-f`, `--fuzzy`: check fuzzy strings
-- `-n`, `--skip-noqa`: do not check "noqa"-commented lines
+- `-n`, `--check-noqa`: check "noqa"-commented lines (they are skipped by default)
 - `-l`, `--no-lines`: do not check number of lines
 - `-p`, `--no-punct`: do not check punctuation at end of strings
 - `-s id|str`, `--spelling id|str`: check spelling (`id` = source messages, `str` = translations)

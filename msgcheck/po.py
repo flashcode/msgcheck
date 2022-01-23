@@ -477,7 +477,7 @@ class PoCheck(object):
         self.checks = {
             'compile': True,
             'fuzzy': False,
-            'skip_noqa': False,
+            'check_noqa': False,
             'lines': True,
             'punct': True,
             'whitespace': True,
@@ -587,9 +587,9 @@ class PoCheck(object):
 
         # check all messages
         check_fuzzy = self.checks['fuzzy']
-        skip_noqa = self.checks['skip_noqa']
+        check_noqa = self.checks['check_noqa']
         for msg in po_file.msgs:
-            if skip_noqa and msg.noqa:
+            if msg.noqa and not check_noqa:
                 continue
             if msg.fuzzy and not check_fuzzy:
                 continue

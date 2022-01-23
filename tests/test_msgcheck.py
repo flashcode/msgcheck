@@ -114,7 +114,7 @@ def test_checks():
     assert not result[0][1]
 
     # second file has 10 errors
-    assert len(result[1][1]) == 10
+    assert len(result[1][1]) == 9
 
     # check first error
     report = result[1][1][0]
@@ -129,7 +129,7 @@ def test_checks():
             '2 in string, 1 in translation' in str(report))
 
     # check last error
-    report = result[1][1][9]
+    report = result[1][1][8]
     assert report.message == \
         'different whitespace at end of a line: 1 in string, 0 in translation'
     assert report.idmsg == 'whitespace_eol'
@@ -144,7 +144,7 @@ def test_checks():
     for report in result[1][1]:
         errors[report.idmsg] = errors.get(report.idmsg, 0) + 1
     assert errors['lines'] == 2
-    assert errors['punct'] == 2
+    assert errors['punct'] == 1
     assert errors['whitespace'] == 4
     assert errors['whitespace_eol'] == 2
 
@@ -159,20 +159,20 @@ def test_checks_fuzzy():
     assert len(result) == 1
 
     # the file has 11 errors (with the fuzzy string)
-    assert len(result[0][1]) == 11
+    assert len(result[0][1]) == 10
 
 
 def test_checks_noqa():
-    """Test checks on a gettext file ignoring `noqa`-commented lines."""
+    """Test checks on a gettext file including `noqa`-commented lines."""
     po_check = PoCheck()
-    po_check.set_check('skip_noqa', True)
+    po_check.set_check('check_noqa', True)
     result = po_check.check_files([local_path('fr_errors.po')])
 
     # be sure we have one file in result
     assert len(result) == 1
 
-    # the file has 9 errors (`noqa` was skipped)
-    assert len(result[0][1]) == 9
+    # the file has 10 errors (including `noqa`-commented lines)
+    assert len(result[0][1]) == 10
 
 
 def test_replace_fmt_c():
