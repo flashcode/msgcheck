@@ -1,6 +1,6 @@
 # Msgcheck ChangeLog
 
-## Version 3.2.0 (under dev)
+## Version 4.0.0 (2022-01-23)
 
 - Drop Python 2 support, Python 3.6 is now required.
 - Rename option `--skip-noqa` to `--check-noqa` and reverse behavior: without option, strings with `noqa` are now skipped by default.
