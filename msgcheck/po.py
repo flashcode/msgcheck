@@ -51,7 +51,7 @@ def get_concatenated_files(filenames):
     return '\n'.join(content)
 
 
-class PoReport(object):  # pylint: disable=too-few-public-methods
+class PoReport:  # pylint: disable=too-few-public-methods
     """A message in report (commonly an error in detected in gettext file)."""
 
     # pylint: disable=too-many-arguments
@@ -87,7 +87,7 @@ class PoReport(object):  # pylint: disable=too-few-public-methods
         return self.message if isinstance(self.message, list) else []
 
 
-class PoMessage(object):
+class PoMessage:
     """
     A message from a gettext file. It is stored as a list of tuples
     (string, translation).
@@ -332,7 +332,7 @@ class PoMessage(object):
         return errors
 
 
-class Checker(object):  # pylint: disable=too-many-instance-attributes
+class Checker:  # pylint: disable=too-many-instance-attributes
     """Messages checker."""
 
     def __init__(self):
@@ -404,7 +404,7 @@ class Checker(object):  # pylint: disable=too-many-instance-attributes
         return None
 
 
-class PoFile(object):
+class PoFile:
     """
     A gettext file. It includes methods to read the file, and perform
     checks on the translations.
@@ -469,7 +469,7 @@ class PoFile(object):
         return (output, 0)
 
 
-class PoCheck(object):
+class PoCheck:
     """Perform checks on a gettext file."""
 
     def __init__(self):

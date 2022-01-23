@@ -28,8 +28,8 @@ flake8:
 	flake8 . --count --exit-zero --max-complexity=10 --statistics
 
 pylint:
-	pylint --disable=W0511,R0205 msgcheck
-	pylint --disable=W0511,R0205 tests
+	pylint --disable=W0511 msgcheck
+	pylint --disable=W0511 tests
 
 bandit:
 	bandit -r msgcheck
