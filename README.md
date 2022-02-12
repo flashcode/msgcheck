@@ -2,6 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/msgcheck.svg)](https://pypi.org/project/msgcheck/)
 [![Build Status](https://github.com/flashcode/msgcheck/workflows/CI/badge.svg)](https://github.com/flashcode/msgcheck/actions?query=workflow%3A%22CI%22)
+[![Build Status](https://github.com/flashcode/msgcheck/workflows/CodeQL/badge.svg)](https://github.com/flashcode/msgcheck/actions?query=workflow%3A%22CodeQL%22)
 
 Msgcheck performs various checks on gettext files (with extension `.po`):
 
