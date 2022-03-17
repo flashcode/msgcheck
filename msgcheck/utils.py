@@ -28,26 +28,26 @@ import re
 
 # TODO: add support for other languages
 STR_FORMATTERS = defaultdict(list)
-STR_FORMATTERS.update({
-    'c': (
-        (r'[\%]{2}', '%'),
-        (r'\%([ hlL\d\.\-\+\#\*]+)?[cdieEfgGosuxXpn]', r''),
-    ),
-    'python': (
-        (r'[\%]{2}', '%'),
-        (r'\%([.\d]+)?[bcdeEfFgGnosxX]', r''),
-        (r'\%(\([^)]*\))([.\d]+)?[bcdeEfFgGnosxX]', r''),
-    ),
-    'python-brace': (
-        (r'\{([^\:\}]*)?(:[^\}]*)?\}', r''),
-    ),
-})
+STR_FORMATTERS.update(
+    {
+        "c": (
+            (r"[\%]{2}", "%"),
+            (r"\%([ hlL\d\.\-\+\#\*]+)?[cdieEfgGosuxXpn]", r""),
+        ),
+        "python": (
+            (r"[\%]{2}", "%"),
+            (r"\%([.\d]+)?[bcdeEfFgGnosxX]", r""),
+            (r"\%(\([^)]*\))([.\d]+)?[bcdeEfFgGnosxX]", r""),
+        ),
+        "python-brace": ((r"\{([^\:\}]*)?(:[^\}]*)?\}", r""),),
+    }
+)
 
 
 def count_lines(string):
     """Count the number of lines in a string or translation."""
-    count = len(string.split('\n'))
-    if count > 1 and string.endswith('\n'):
+    count = len(string.split("\n"))
+    if count > 1 and string.endswith("\n"):
         count -= 1
     return count
 

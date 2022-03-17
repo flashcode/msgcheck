@@ -21,39 +21,39 @@
 from setuptools import setup
 from msgcheck.msgcheck import msgcheck_version
 
-DESCRIPTION = 'Gettext file checker.'
+DESCRIPTION = "Gettext file checker."
 
-with open('README.md', 'r', encoding='utf-8') as f:
+with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read()
 
 setup(
-    name='msgcheck',
+    name="msgcheck",
     version=msgcheck_version(),
     description=DESCRIPTION,
     long_description=readme,
-    long_description_content_type='text/markdown',
-    author='Sébastien Helleu',
-    author_email='flashcode@flashtux.org',
-    url='https://github.com/flashcode/msgcheck',
-    license='GPL3',
-    keywords='gettext',
+    long_description_content_type="text/markdown",
+    author="Sébastien Helleu",
+    author_email="flashcode@flashtux.org",
+    url="https://github.com/flashcode/msgcheck",
+    license="GPL3",
+    keywords="gettext",
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU General Public License v3 '
-        'or later (GPLv3+)',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Topic :: Software Development :: Localization',
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License v3 "
+        "or later (GPLv3+)",
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Topic :: Software Development :: Localization",
     ],
-    packages=['msgcheck'],
-    tests_require=['nose'],
+    packages=["msgcheck"],
+    tests_require=["nose"],
     test_suite="nose.collector",
-    install_requires=['pyenchant'],
+    install_requires=["pyenchant"],
     entry_points={
-        'console_scripts': ['msgcheck=msgcheck.msgcheck:main'],
-    }
+        "console_scripts": ["msgcheck=msgcheck.msgcheck:main"],
+    },
 )
