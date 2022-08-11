@@ -12,7 +12,6 @@ jobs:
       matrix:
         os:
           - ubuntu-22.04
-          - ubuntu-20.04
         python-version:
           - "3.7"
           - "3.8"
@@ -33,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install gettext aspell aspell-fr enchant
+          sudo apt-get install gettext aspell aspell-fr enchant-2
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install bandit coverage flake8 pylint pytest pytest-cov
