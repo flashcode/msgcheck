@@ -14,18 +14,18 @@
 ## Version 3.1 (2020-03-07)
 
 - Add option `-i` (or `--ignore-errors`): always return 0 even if errors are found.
-- Fix parsing of "noqa" tag in comments (issue #11).
+- Fix parsing of "noqa" tag in comments ([#11](https://github.com/flashcode/msgcheck/issues/11)).
 - Use pytest for unit tests.
 - Replace Travis CI by GitHub Actions.
 
 ## Version 3.0 (2018-12-14)
 
-- Add support of multiple personal word list files (multiple options `-P`/`--pwl`) (issue #5).
+- Add support of multiple personal word list files (multiple options `-P`/`--pwl`) ([#5](https://github.com/flashcode/msgcheck/issues/5)).
 
 ## Version 2.9 (2018-01-15)
 
-- Add option `-n` (or `--skip-noqa`) to not check "noqa"-commented lines (issue #2, issue #7).
-- Remove C and Python string formatters for spell checking (issue #3).
+- Add option `-n` (or `--skip-noqa`) to not check "noqa"-commented lines ([#2](https://github.com/flashcode/msgcheck/issues/2), [#7](https://github.com/flashcode/msgcheck/issues/7)).
+- Remove C and Python string formatters for spell checking ([#3](https://github.com/flashcode/msgcheck/issues/3)).
 
 ## Version 2.8 (2014-12-07)
 
