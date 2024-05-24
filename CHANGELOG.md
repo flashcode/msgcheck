@@ -35,10 +35,10 @@
 
 ## Version 2.7 (2014-06-28)
 
-* Add argument id/str for `-s`/`--spelling` to check messages or translations.
-* Ensure pwl is not None before checking if file exists.
-* Exit immediately if pwl file does not exist.
-* Add pylint checks for Travis CI.
+- Add argument id/str for `-s`/`--spelling` to check messages or translations.
+- Ensure pwl is not None before checking if file exists.
+- Exit immediately if pwl file does not exist.
+- Add pylint checks for Travis CI.
 
 ## Version 2.6 (2014-05-03)
 
@@ -87,7 +87,7 @@
 
 ## Version 1.7 (2013-09-21)
 
-* Add option `--onlymisspelled` to display only misspelled words instead of errors with translations.
+- Add option `--onlymisspelled` to display only misspelled words instead of errors with translations.
 
 ## Version 1.6 (2013-09-15)
 
