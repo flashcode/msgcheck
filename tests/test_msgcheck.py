@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (C) 2009-2023 Sébastien Helleu <flashcode@flashtux.org>
+# Copyright (C) 2009-2024 Sébastien Helleu <flashcode@flashtux.org>
 #
 # This file is part of msgcheck.
 #
