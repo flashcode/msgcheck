@@ -54,7 +54,7 @@ def get_concatenated_files(filenames):
 class PoReport:  # pylint: disable=too-few-public-methods
     """A message in report (commonly an error in detected in gettext file)."""
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     def __init__(
         self,
         message,
@@ -123,7 +123,7 @@ class PoMessage:
               ("%d files found", "%d fichiers trouvés")]
     """
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     def __init__(self, filename, line, msg, charset, fuzzy, fmt, noqa):
         """Build a PO message."""
         self.filename = filename
@@ -427,7 +427,7 @@ class PoFile:
         }
         self.msgs = []
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     def _add_message(self, numline_msgid, fuzzy, fmt, noqa, msg):
         """
         Add a message from PO file in list of messages.
