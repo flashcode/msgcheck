@@ -1,6 +1,6 @@
 # Msgcheck ChangeLog
 
-## Version 4.1.0 (under dev)
+## Version 4.1.0 (2024-10-23)
 
 ### Changed
 
