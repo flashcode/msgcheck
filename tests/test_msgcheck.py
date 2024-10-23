@@ -434,3 +434,16 @@ def test_punct_full_stop_ja_zh(language, msgid, msgstr, error_message):
         assert error_message in errors[0].message
     else:
         assert not errors
+
+
+def test_invalid_utf8():
+    """Test checks on a file with invalid UTF-8 chars."""
+    po_check = PoCheck()
+    po_check.set_check("fuzzy", True)
+    result = po_check.check_files([local_path("fr_invalid_utf8.po")])
+
+    # be sure we have one file in result
+    assert len(result) == 1
+
+    # the file has no errors
+    assert len(result[0][1]) == 0

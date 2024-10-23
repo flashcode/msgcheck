@@ -6,6 +6,10 @@
 
 - Use file README.md as package long description
 
+### Fixed
+
+- Fix UnicodeDecodeError in case of invalid UTF-8 in input file
+
 ## Version 4.0.0 (2022-01-23)
 
 ### Changed

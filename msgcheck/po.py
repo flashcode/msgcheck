@@ -468,7 +468,7 @@ class PoFile:
         """
         self.msgs = []
         checker = Checker()
-        with open(self.filename, "r", encoding="utf-8") as po_file:
+        with open(self.filename, "r", encoding="utf-8", errors="ignore") as po_file:
             for line in po_file:
                 message = checker.check_line(line.strip())
                 if message:
