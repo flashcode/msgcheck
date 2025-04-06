@@ -95,7 +95,7 @@ current value
 
 ## Copyright
 
-Copyright © 2009-2024 [Sébastien Helleu](https://github.com/flashcode)
+Copyright © 2009-2025 [Sébastien Helleu](https://github.com/flashcode)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
