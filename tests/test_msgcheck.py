@@ -124,12 +124,12 @@ def test_checks():
     assert report.message == "number of lines: 2 in string, 1 in translation"
     assert report.idmsg == "lines"
     assert "fr_errors.po" in report.filename
-    assert report.line == 42
+    assert report.line == 44
     assert report.mid == "Test 1 on two lines.\nLine 2."
     assert report.mstr == "Test 1 sur deux lignes."
     assert report.fuzzy is False
     assert (
-        "fr_errors.po:42: [lines] number of lines: "
+        "fr_errors.po:44: [lines] number of lines: "
         "2 in string, 1 in translation" in str(report)
     )
 
@@ -142,7 +142,7 @@ def test_checks():
     assert report.message == expected
     assert report.idmsg == "whitespace_eol"
     assert "fr_errors.po" in report.filename
-    assert report.line == 74
+    assert report.line == 76
     assert report.mid == "Line 1. \nLine 2."
     assert report.mstr == "Ligne 1.\nLigne 2."
     assert report.fuzzy is False
