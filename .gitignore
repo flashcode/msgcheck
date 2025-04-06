@@ -1,6 +1,7 @@
-.coverage
 *.pyc
 *.pyo
+.coverage
+.hypothesis/
 build/
 dist/
 msgcheck.egg-info/
