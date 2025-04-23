@@ -17,3 +17,9 @@ path = [
 precedence = "override"
 SPDX-FileCopyrightText = "2009-2025 Sébastien Helleu <flashcode@flashtux.org>"
 SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "tests/fr_invalid_utf8.po"
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Sébastien Helleu <flashcode@flashtux.org>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
