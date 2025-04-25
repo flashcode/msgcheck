@@ -7,11 +7,6 @@ version = 1
 [[annotations]]
 path = [
     ".github/ISSUE_TEMPLATE/*.md",
-    ".github/ISSUE_TEMPLATE/*.yml",
-    ".gitignore",
-    "CHANGELOG.md",
-    "README.md",
-    "requirements.txt",
     "tests/pwl*.txt",
 ]
 precedence = "override"
