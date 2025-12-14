@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2025 Sébastien Helleu <flashcode@flashtux.org>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+repos:
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.14.9
+  hooks:
+    - id: ruff
