@@ -397,7 +397,7 @@ def test_spelling_bad_pwl() -> None:
 )
 def test_punct_full_stop_ja_zh(language: str, msgid: str, msgstr: str, error_message: str) -> None:
     """Test punctuation with non-latin full-stops."""
-    msg = PoMessage("translation.po", 42, {}, "utf-8", False, False, False)
+    msg = PoMessage("translation.po", 42, {}, "utf-8", False, None, False)
     msg.messages = [(msgid, msgstr)]
     errors = PoMessage.check_punct(msg, language)
     if error_message:
