@@ -609,7 +609,7 @@ class PoCheck:
 
         return reports
 
-    def check_files(self, files: list[str]) -> tuple[str, list[PoReport]]:
+    def check_files(self, files: list[str]) -> list[tuple[str, list[PoReport]]]:
         """Check translations in PO files.
 
         Return a list of tuples: (filename, [PoReport, PoReport, ...]).

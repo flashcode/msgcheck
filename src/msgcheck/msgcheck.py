@@ -167,7 +167,7 @@ def msgcheck_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
     return parser.parse_args(shlex.split(os.getenv("MSGCHECK_OPTIONS") or "") + sys.argv[1:])
 
 
-def msgcheck_check_files(args: argparse.Namespace) -> tuple[str, list[PoReport]]:
+def msgcheck_check_files(args: argparse.Namespace) -> list[tuple[str, list[PoReport]]]:
     """Check files."""
     # create checker and set boolean options
     po_check = PoCheck()
@@ -195,7 +195,10 @@ def msgcheck_check_files(args: argparse.Namespace) -> tuple[str, list[PoReport]]
     return result
 
 
-def msgcheck_display_errors(args: argparse.Namespace, result: tuple[str, list[PoReport]]) -> tuple[int, int, int]:
+def msgcheck_display_errors(
+    args: argparse.Namespace,
+    result: list[tuple[str, list[PoReport]]],
+) -> tuple[int, int, int]:
     """Display error messages."""
     files_ok, files_with_errors, total_errors = 0, 0, 0
     for _, reports in result:
@@ -215,7 +218,7 @@ def msgcheck_display_errors(args: argparse.Namespace, result: tuple[str, list[Po
     return files_ok, files_with_errors, total_errors
 
 
-def msgcheck_display_result(args: argparse.Namespace, result: tuple[str, list[PoReport]]) -> int:
+def msgcheck_display_result(args: argparse.Namespace, result: list[tuple[str, list[PoReport]]]) -> int:
     """Display result and return the number of files with errors."""
     # display errors
     files_ok, files_with_errors, total_errors = msgcheck_display_errors(args, result)
