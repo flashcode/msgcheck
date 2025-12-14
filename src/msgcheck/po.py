@@ -124,7 +124,7 @@ class PoMessage:
         self,
         filename: str,
         line: int,
-        msg: dict[Any, Any],
+        msg: dict[str, str],
         charset: str,
         fuzzy: bool,
         fmt: str,
@@ -305,7 +305,7 @@ class PoMessage:
 
         Return a list with errors detected.
         """
-        errors = []
+        errors: list[PoReport] = []
         if not checkers:
             return errors
         for mid, mstr in self.messages:
@@ -349,13 +349,13 @@ class Checker:  # pylint: disable=too-many-instance-attributes
         self.msgfuzzy = False
         self.noqa = False
         self.msgnoqa = False
-        self.fmt = None
-        self.msgfmt = None
-        self.msg = {}
+        self.fmt: str | None = None
+        self.msgfmt: str | None = None
+        self.msg: dict[str, str] = {}
         self.msgcurrent = ""
         self.oldmsgcurrent = ""
 
-    def check_line(self, line: str) -> tuple[int, bool, str, bool, str] | None:
+    def check_line(self, line: str) -> tuple[int, bool, str | None, bool, dict[str, str]] | None:
         """Check a line of a PO file."""
         message = None
         self.numline += 1
@@ -395,7 +395,7 @@ class Checker:  # pylint: disable=too-many-instance-attributes
             self.msg[self.msgcurrent] = self.msg.get(self.msgcurrent, "") + line[1:-1]
         return message
 
-    def last_check(self) -> tuple[int, bool, str, bool, str] | None:
+    def last_check(self) -> tuple[int, bool, str | None, bool, dict[str, str]] | None:
         """Consume the last message (after all lines were read)."""
         if self.msgcurrent.startswith("msgstr"):
             return (
@@ -425,7 +425,7 @@ class PoFile:
         self.msgs = []
 
     # pylint: disable=too-many-arguments, too-many-positional-arguments
-    def _add_message(self, numline_msgid: int, fuzzy: bool, fmt: str, noqa: bool, msg: str) -> None:
+    def _add_message(self, numline_msgid: int, fuzzy: bool, fmt: str, noqa: bool, msg: dict[str, str]) -> None:
         """Add a message from PO file in list of messages."""
         if "msgid" in msg and not msg["msgid"]:
             # find file language/charset in properties
