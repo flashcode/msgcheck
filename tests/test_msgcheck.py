@@ -330,7 +330,7 @@ def test_spelling_str_multiple_pwl() -> None:
 def test_spelling_bad_dict() -> None:
     """Test spelling with a bad dict option."""
     po_check = PoCheck()
-    po_check.set_spelling_options("str", "xxx", None)
+    po_check.set_spelling_options("str", "xxx", [])
     assert not po_check.extra_checkers
 
 
