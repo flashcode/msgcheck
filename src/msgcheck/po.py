@@ -49,7 +49,7 @@ def get_concatenated_files(filenames: list[str]) -> str | None:
     return "\n".join(content)
 
 
-class PoReport:  # pylint: disable=too-few-public-methods
+class PoReport:
     """A message in report (commonly an error in detected in gettext file)."""
 
     def __init__(  # noqa: PLR0913
@@ -338,7 +338,7 @@ class PoMessage:
         return errors
 
 
-class Checker:  # pylint: disable=too-many-instance-attributes
+class Checker:
     """Messages checker."""
 
     def __init__(self) -> None:
@@ -424,7 +424,6 @@ class PoFile:
         }
         self.msgs = []
 
-    # pylint: disable=too-many-arguments, too-many-positional-arguments
     def _add_message(self, numline_msgid: int, fuzzy: bool, fmt: str, noqa: bool, msg: dict[str, str]) -> None:
         """Add a message from PO file in list of messages."""
         if "msgid" in msg and not msg["msgid"]:
