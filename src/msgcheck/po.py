@@ -127,7 +127,7 @@ class PoMessage:
         msg: dict[str, str],
         charset: str,
         fuzzy: bool,
-        fmt: str,
+        fmt: str | None,
         noqa: bool,
     ) -> None:
         """Build a PO message."""
@@ -422,9 +422,9 @@ class PoFile:
             "language_numline": 0,
             "charset": "utf-8",
         }
-        self.msgs = []
+        self.msgs: list[PoMessage] = []
 
-    def _add_message(self, numline_msgid: int, fuzzy: bool, fmt: str, noqa: bool, msg: dict[str, str]) -> None:
+    def _add_message(self, numline_msgid: int, fuzzy: bool, fmt: str | None, noqa: bool, msg: dict[str, str]) -> None:
         """Add a message from PO file in list of messages."""
         if "msgid" in msg and not msg["msgid"]:
             # find file language/charset in properties
@@ -504,7 +504,7 @@ class PoCheck:
         # spelling options
         self.spelling: str | None = None
         self.dicts: str | None = None
-        self.extra_checkers = []
+        self.extra_checkers: list[SpellChecker] = []
         self.pwl: str | None = None
 
     def __repr__(self) -> str:
@@ -568,7 +568,13 @@ class PoCheck:
                 checker = []
         return checker
 
-    def check_msg(self, po_file: PoFile, checker: SpellChecker, msg: PoMessage, reports: list[PoReport]) -> None:
+    def check_msg(
+        self,
+        po_file: PoFile,
+        checker: list[SpellChecker],
+        msg: PoMessage,
+        reports: list[PoReport],
+    ) -> None:
         """Check one message."""
         if self.checks["extract"]:
             for mid, mstr in msg.messages:
@@ -637,7 +643,6 @@ class PoCheck:
                 result.append((po_file.filename, self.check_pofile(po_file)))
             else:
                 # compilation failed
-                compile_output = bytes(compile_output).decode("utf-8")
                 result.append(
                     (
                         po_file.filename,
