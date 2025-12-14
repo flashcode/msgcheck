@@ -236,8 +236,8 @@ def msgcheck_display_result(args: argparse.Namespace, result: list[tuple[str, li
         if errors == 0:
             print(f"{filename}: OK")
         else:
-            result = "almost good!" if errors <= 10 else "uh oh... try again!"  # noqa: PLR2004
-            print(f"{filename}: {errors} errors ({result})")
+            str_result = "almost good!" if errors <= 10 else "uh oh... try again!"  # noqa: PLR2004
+            print(f"{filename}: {errors} errors ({str_result})")
 
     # display total (if many files processed)
     if len(args.file) > 1:
