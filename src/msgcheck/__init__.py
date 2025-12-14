@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # SPDX-FileCopyrightText: 2009-2025 Sébastien Helleu <flashcode@flashtux.org>
 #
@@ -22,5 +21,9 @@
 
 """Gettext file checker."""
 
-from . import msgcheck  # noqa: F401
-from . import po  # noqa: F401
+from msgcheck.msgcheck import check
+
+
+def main() -> None:
+    """Check files."""
+    check()

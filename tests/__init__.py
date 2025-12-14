@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # SPDX-FileCopyrightText: 2009-2025 Sébastien Helleu <flashcode@flashtux.org>
 #

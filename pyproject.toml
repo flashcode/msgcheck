@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2025 Sébastien Helleu <flashcode@flashtux.org>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[project]
+name = "msgcheck"
+version = "4.2.0-dev"
+description = "Perform various checks on gettext files"
+readme = "README.md"
+authors = [
+    { name = "Sébastien Helleu", email = "flashcode@flashtux.org" }
+]
+license = "GPL-3.0-or-later"
+keywords = ["gettext"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Localization",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "pyenchant>=3.3.0",
+]
+
+[project.scripts]
+msgcheck = "msgcheck:main"
+
+[project.urls]
+Repository = "https://github.com/flashcode/msgcheck"
+Issues = "https://github.com/flashcode/msgcheck/issues"
+Changelog = "https://github.com/flashcode/msgcheck/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = ["uv_build>=0.9.17,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4.4",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["ALL"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/*.py" = [
+    "ANN001", # missing-type-function-argument
+    "FBT", # flake8-boolean-trap
+    "PLR2004", # magic-value-comparison
+    "S101", # assert
+]

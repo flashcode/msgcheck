@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # SPDX-FileCopyrightText: 2009-2025 Sébastien Helleu <flashcode@flashtux.org>
 #
@@ -22,26 +21,20 @@
 
 """Tests on msgcheck."""
 
-import os
+from pathlib import Path
+
 import pytest
 
-from msgcheck.msgcheck import msgcheck_version
-from msgcheck.po import PoFile, PoCheck, PoMessage
+from msgcheck.po import PoCheck, PoFile, PoMessage
 from msgcheck.utils import replace_formatters
 
 
-def local_path(filename):
+def local_path(filename: str) -> str:
     """Return path to a file in the "tests" directory."""
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+    return str(Path(__file__).resolve().parent / filename)
 
 
-def test_version():
-    """Test msgcheck version."""
-    version = msgcheck_version()
-    assert len(version.split(".")) > 1
-
-
-def test_compilation():
+def test_compilation() -> None:
     """Test compilation of gettext files."""
     # valid file
     assert PoFile(local_path("fr.po")).compile()[1] == 0
@@ -50,20 +43,20 @@ def test_compilation():
     assert PoFile(local_path("fr_compile.po")).compile()[1] == 1
 
 
-def test_read():
+def test_read() -> None:
     """Test read of gettext files."""
     # valid file
     try:
         PoFile(local_path("fr.po")).read()
-    except IOError:
+    except OSError:
         pytest.fail("Read error on a valid file.")
 
     # non-existing file
-    with pytest.raises(IOError):
+    with pytest.raises(FileNotFoundError):
         PoFile(local_path("fr_does_not_exist.po")).read()
 
 
-def test_extract():
+def test_extract() -> None:
     """Test extract on a gettext file."""
     po_check = PoCheck()
     po_check.set_check("extract", True)
@@ -93,22 +86,20 @@ def test_extract():
     assert str(report) == "Test sur deux lignes.\nLigne 2.\n---"
 
     report = result[0][1][2]
-    assert report.message == " erreur : %s"
+    assert report.message == " erreur : %s"  # noqa: RUF001
     assert report.idmsg == "extract"
     assert report.filename == "-"
     assert report.line == 0
     assert report.mid == ""
     assert report.mstr == ""
     assert report.fuzzy is False
-    assert str(report) == " erreur : %s\n---"
+    assert str(report) == " erreur : %s\n---"  # noqa: RUF001
 
 
-def test_checks():
+def test_checks() -> None:
     """Test checks on gettext files."""
     po_check = PoCheck()
-    result = po_check.check_files(
-        [local_path("fr.po"), local_path("fr_errors.po")]
-    )
+    result = po_check.check_files([local_path("fr.po"), local_path("fr_errors.po")])
 
     # be sure we have 2 files in result
     assert len(result) == 2
@@ -128,17 +119,11 @@ def test_checks():
     assert report.mid == "Test 1 on two lines.\nLine 2."
     assert report.mstr == "Test 1 sur deux lignes."
     assert report.fuzzy is False
-    assert (
-        "fr_errors.po:44: [lines] number of lines: "
-        "2 in string, 1 in translation" in str(report)
-    )
+    assert "fr_errors.po:44: [lines] number of lines: 2 in string, 1 in translation" in str(report)
 
     # check last error
     report = result[1][1][8]
-    expected = (
-        "different whitespace at end of a line: "
-        "1 in string, 0 in translation"
-    )
+    expected = "different whitespace at end of a line: 1 in string, 0 in translation"
     assert report.message == expected
     assert report.idmsg == "whitespace_eol"
     assert "fr_errors.po" in report.filename
@@ -157,7 +142,7 @@ def test_checks():
     assert errors["whitespace_eol"] == 2
 
 
-def test_checks_fuzzy():
+def test_checks_fuzzy() -> None:
     """Test checks on a gettext file including fuzzy strings."""
     po_check = PoCheck()
     po_check.set_check("fuzzy", True)
@@ -170,7 +155,7 @@ def test_checks_fuzzy():
     assert len(result[0][1]) == 10
 
 
-def test_checks_noqa():
+def test_checks_noqa() -> None:
     """Test checks on a gettext file including `noqa`-commented lines."""
     po_check = PoCheck()
     po_check.set_check("check_noqa", True)
@@ -183,7 +168,7 @@ def test_checks_noqa():
     assert len(result[0][1]) == 10
 
 
-def test_replace_fmt_c():
+def test_replace_fmt_c() -> None:
     """Test removal of formatters in a C string."""
     assert replace_formatters("%s", "c") == ""
     assert replace_formatters("%%", "c") == "%"
@@ -191,15 +176,11 @@ def test_replace_fmt_c():
     assert replace_formatters("%!%s%!", "c") == "%!%!"
     assert replace_formatters("%.02!", "c") == "%.02!"
     assert replace_formatters("%.3fThis is a %stest", "c") == "This is a test"
-    assert (
-        replace_formatters("%.3fTest%s%d%%%.03f%luhere% s", "c")
-        == "Test%here"
-    )
+    assert replace_formatters("%.3fTest%s%d%%%.03f%luhere% s", "c") == "Test%here"
 
 
-def test_replace_fmt_python():
+def test_replace_fmt_python() -> None:
     """Test removal of formatters in a python string."""
-    # str.__mod__()
     assert replace_formatters("%s", "python") == ""
     assert replace_formatters("%b", "python") == ""
     assert replace_formatters("%%", "python") == "%"
@@ -208,9 +189,8 @@ def test_replace_fmt_python():
     assert replace_formatters("%(sth)02f", "python") == ""
 
 
-def test_replace_fmt_python_brace():
+def test_replace_fmt_python_brace() -> None:
     """Test removal of formatters in a python brace string."""
-    # str.format()
     conditions = (
         (
             "First, thou shalt count to {0}",
@@ -225,7 +205,7 @@ def test_replace_fmt_python_brace():
         (
             "From {} to {}",
             "From  to ",
-            "Same as \"From {0} to {1}\"",
+            'Same as "From {0} to {1}"',
         ),
         (
             "My quest is {name}",
@@ -244,12 +224,10 @@ def test_replace_fmt_python_brace():
         ),
     )
     for condition in conditions:
-        assert (
-            replace_formatters(condition[0], "python-brace") == condition[1]
-        ), condition[2]
+        assert replace_formatters(condition[0], "python-brace") == condition[1], condition[2]
 
 
-def test_spelling_id():
+def test_spelling_id() -> None:
     """Test spelling on source messages (English) of gettext files."""
     po_check = PoCheck()
     pwl_files = [local_path("pwl1.txt")]
@@ -270,11 +248,8 @@ def test_spelling_id():
         assert report[i].get_misspelled_words() == [word]
 
 
-def test_spelling_id_multilpe_pwl():
-    """
-    Test spelling on source messages (English) of gettext files
-    using multiple personal word lists.
-    """
+def test_spelling_id_multilpe_pwl() -> None:
+    """Test spelling on source messages (English) of gettext files using multiple personal word lists."""
     po_check = PoCheck()
     pwl_files = [
         local_path("pwl1.txt"),
@@ -297,14 +272,12 @@ def test_spelling_id_multilpe_pwl():
         assert report[i].get_misspelled_words() == [word]
 
 
-def test_spelling_str():
+def test_spelling_str() -> None:
     """Test spelling on translated messages of gettext files."""
     po_check = PoCheck()
     pwl_files = [local_path("pwl1.txt")]
     po_check.set_spelling_options("str", None, pwl_files)
-    result = po_check.check_files(
-        [local_path("fr_spelling_str.po"), local_path("fr_language.po")]
-    )
+    result = po_check.check_files([local_path("fr_spelling_str.po"), local_path("fr_language.po")])
 
     # be sure we have 2 files in result
     assert len(result) == 2
@@ -325,20 +298,15 @@ def test_spelling_str():
     assert report[0].idmsg == "dict"
 
 
-def test_spelling_str_multiple_pwl():
-    """
-    Test spelling on translated messages of gettext files
-    using multiple personal word lists.
-    """
+def test_spelling_str_multiple_pwl() -> None:
+    """Test spelling on translated messages of gettext files using multiple personal word lists."""
     po_check = PoCheck()
     pwl_files = [
         local_path("pwl1.txt"),
         local_path("pwl2.txt"),
     ]
     po_check.set_spelling_options("str", None, pwl_files)
-    result = po_check.check_files(
-        [local_path("fr_spelling_str.po"), local_path("fr_language.po")]
-    )
+    result = po_check.check_files([local_path("fr_spelling_str.po"), local_path("fr_language.po")])
 
     # be sure we have 2 files in result
     assert len(result) == 2
@@ -359,23 +327,23 @@ def test_spelling_str_multiple_pwl():
     assert report[0].idmsg == "dict"
 
 
-def test_spelling_bad_dict():
+def test_spelling_bad_dict() -> None:
     """Test spelling with a bad dict option."""
     po_check = PoCheck()
     po_check.set_spelling_options("str", "xxx", None)
     assert not po_check.extra_checkers
 
 
-def test_spelling_bad_pwl():
+def test_spelling_bad_pwl() -> None:
     """Test spelling with a bad pwl option."""
     po_check = PoCheck()
-    with pytest.raises(IOError):
-        pwl_files = [local_path("pwl_does_not_exist.txt")]
+    pwl_files = [local_path("pwl_does_not_exist.txt")]
+    with pytest.raises(FileNotFoundError):
         po_check.set_spelling_options("str", None, pwl_files)
 
 
 @pytest.mark.parametrize(
-    "language, msgid, msgstr, error_message",
+    ("language", "msgid", "msgstr", "error_message"),
     [
         (
             "ja",
@@ -387,19 +355,19 @@ def test_spelling_bad_pwl():
             "ja",
             "Should raise an error",
             "エラーを発生させる必要があります。",
-            "end punctuation: \"。\" in translation, \".\" not in string",
+            'end punctuation: "。" in translation, "." not in string',
         ),
         (
             "ja",
             "Should raise an error.",
             "エラーを発生させる必要があります",
-            "end punctuation: \".\" in string, \"。\" not in translation",
+            'end punctuation: "." in string, "。" not in translation',
         ),
         (
             "ja",
             "Should raise an error.",
             "エラーを発生させる必要があります.",
-            "end punctuation: \".\" in string, \"。\" not in translation",
+            'end punctuation: "." in string, "。" not in translation',
         ),
         (
             "zh-Hans",
@@ -411,23 +379,23 @@ def test_spelling_bad_pwl():
             "zh-Hans",
             "Should raise an error",
             "应该会出现一个错误。",
-            "end punctuation: \"。\" in translation, \".\" not in string",
+            'end punctuation: "。" in translation, "." not in string',
         ),
         (
             "zh-Hans",
             "Should raise an error.",
             "应该会出现一个错误",
-            "end punctuation: \".\" in string, \"。\" not in translation",
+            'end punctuation: "." in string, "。" not in translation',
         ),
         (
             "zh-Hans",
             "Should raise an error.",
             "应该会出现一个错误.",
-            "end punctuation: \".\" in string, \"。\" not in translation",
+            'end punctuation: "." in string, "。" not in translation',
         ),
     ],
 )
-def test_punct_full_stop_ja_zh(language, msgid, msgstr, error_message):
+def test_punct_full_stop_ja_zh(language: str, msgid: str, msgstr: str, error_message: str) -> None:
     """Test punctuation with non-latin full-stops."""
     msg = PoMessage("translation.po", 42, {}, "utf-8", False, False, False)
     msg.messages = [(msgid, msgstr)]
@@ -438,7 +406,7 @@ def test_punct_full_stop_ja_zh(language, msgid, msgstr, error_message):
         assert not errors
 
 
-def test_invalid_utf8():
+def test_invalid_utf8() -> None:
     """Test checks on a file with invalid UTF-8 chars."""
     po_check = PoCheck()
     po_check.set_check("fuzzy", True)

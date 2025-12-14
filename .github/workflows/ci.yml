@@ -28,27 +28,22 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Install uv and set the Python version
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
 
       - name: Install dependencies
         run: |
           sudo apt-get install gettext aspell aspell-fr enchant-2
-          pip install -r requirements.txt
-          pip install bandit coverage flake8 pylint pytest pytest-cov
 
-      - name: Lint with flake8
-        run: make flake8
+      - name: Lint
+        run: make lint
 
-      - name: Lint with pylint
-        run: make pylint
-
-      - name: Lint with bandit
-        run: make bandit
-
-      - name: Test with pytest
+      - name: Run tests
         run: make test

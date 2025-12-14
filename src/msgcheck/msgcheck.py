@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # SPDX-FileCopyrightText: 2009-2025 Sébastien Helleu <flashcode@flashtux.org>
 #
@@ -20,37 +19,32 @@
 # along with msgcheck.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-"""
-Perform various checks on gettext files:
-* compilation (with command `msgfmt -c`)
-* for each translation:
-  * number of lines in translated strings
-  * whitespace at beginning/end of strings
-  * trailing whitespace at end of lines inside strings
-  * punctuation at end of strings
-  * spelling (messages and translations)
+"""Perform various checks on gettext files.
+
+Checks:
+
+- compilation (with command `msgfmt -c`)
+- for each translation:
+  - number of lines in translated strings
+  - whitespace at beginning/end of strings
+  - trailing whitespace at end of lines inside strings
+  - punctuation at end of strings
+  - spelling (messages and translations)
 """
 
-from __future__ import print_function
+# ruff: noqa: T201
 
 import argparse
+import importlib.metadata
 import os
 import shlex
 import sys
 
-from .po import PoCheck
+from msgcheck.po import PoCheck, PoReport
 
 
-__version__ = "4.2.0-dev"
-
-
-def msgcheck_version():
-    """Return the msgcheck version."""
-    return __version__
-
-
-def msgcheck_parser():
-    """Return a command line parser for msgcheck (argparse.ArgumentParser)."""
+def msgcheck_parser() -> argparse.ArgumentParser:
+    """Return a command line parser for msgcheck."""
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         fromfile_prefix_chars="@",
@@ -72,13 +66,16 @@ The script returns:
         help="do not check compilation of file",
     )
     parser.add_argument(
-        "-f", "--fuzzy", action="store_true", help="check fuzzy strings"
+        "-f",
+        "--fuzzy",
+        action="store_true",
+        help="check fuzzy strings",
     )
     parser.add_argument(
         "-n",
         "--check-noqa",
         action="store_true",
-        help="check \"noqa\"-commented lines (they are skipped by default)",
+        help='check "noqa"-commented lines (they are skipped by default)',
     )
     parser.add_argument(
         "-l",
@@ -93,13 +90,15 @@ The script returns:
         help="do not check punctuation at end of strings",
     )
     parser.add_argument(
-        "-s", "--spelling", choices=["id", "str"], help="check spelling"
+        "-s",
+        "--spelling",
+        choices=["id", "str"],
+        help="check spelling",
     )
     parser.add_argument(
         "-d",
         "--dicts",
-        help="comma-separated list of extra dictionaries "
-        "to use (in addition to file language)",
+        help="comma-separated list of extra dictionaries to use (in addition to file language)",
     )
     parser.add_argument(
         "-P",
@@ -113,29 +112,25 @@ The script returns:
         "-m",
         "--only-misspelled",
         action="store_true",
-        help="display only misspelled words (no error, "
-        "line number and translation)",
+        help="display only misspelled words (no error, line number and translation)",
     )
     parser.add_argument(
         "-w",
         "--no-whitespace",
         action="store_true",
-        help="do not check whitespace at beginning/end of " "strings",
+        help="do not check whitespace at beginning/end of strings",
     )
     parser.add_argument(
         "-W",
         "--no-whitespace-eol",
         action="store_true",
-        help="do not check trailing whitespace at end of "
-        "lines inside strings",
+        help="do not check trailing whitespace at end of lines inside strings",
     )
     parser.add_argument(
         "-e",
         "--extract",
         action="store_true",
-        help="display all translations and exit "
-        "(all checks except compilation are disabled in "
-        "this mode)",
+        help="display all translations and exit (all checks except compilation are disabled in this mode)",
     )
     parser.add_argument(
         "-i",
@@ -149,26 +144,30 @@ The script returns:
         action="store_true",
         help="quiet mode: only display number of errors",
     )
+    version = importlib.metadata.version("msgcheck")
     parser.add_argument(
-        "-v", "--version", action="version", version=msgcheck_version()
+        "-v",
+        "--version",
+        action="version",
+        version=version,
     )
     parser.add_argument(
-        "file", nargs="+", help="gettext file(s) to check (*.po files)"
+        "file",
+        nargs="+",
+        help="gettext file(s) to check (*.po files)",
     )
     return parser
 
 
-def msgcheck_args(parser):
+def msgcheck_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
     """Return msgcheck options."""
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
-    return parser.parse_args(
-        shlex.split(os.getenv("MSGCHECK_OPTIONS") or "") + sys.argv[1:]
-    )
+    return parser.parse_args(shlex.split(os.getenv("MSGCHECK_OPTIONS") or "") + sys.argv[1:])
 
 
-def msgcheck_check_files(args):
+def msgcheck_check_files(args: argparse.Namespace) -> tuple[str, list[PoReport]]:
     """Check files."""
     # create checker and set boolean options
     po_check = PoCheck()
@@ -183,22 +182,20 @@ def msgcheck_check_files(args):
         "extract",
     ):
         if args.__dict__[option]:
-            po_check.set_check(
-                option.lstrip("no_"), not option.startswith("no_")
-            )
+            po_check.set_check(option.lstrip("no_"), not option.startswith("no_"))
 
     # check all files
     try:
         po_check.set_spelling_options(args.spelling, args.dicts, args.pwl)
         result = po_check.check_files(args.file)
-    except (ImportError, IOError) as exc:
+    except (ImportError, OSError) as exc:
         print("FATAL:", exc, sep=" ")
         sys.exit(1)
 
     return result
 
 
-def msgcheck_display_errors(args, result):
+def msgcheck_display_errors(args: argparse.Namespace, result: tuple[str, list[PoReport]]) -> tuple[int, int, int]:
     """Display error messages."""
     files_ok, files_with_errors, total_errors = 0, 0, 0
     for _, reports in result:
@@ -211,20 +208,17 @@ def msgcheck_display_errors(args, result):
             if args.only_misspelled:
                 words = []
                 for report in reports:
-                    for word in report.get_misspelled_words():
-                        words.append(word)
+                    words.extend(report.get_misspelled_words())
                 print("\n".join(sorted(set(words), key=lambda s: s.lower())))
             else:
                 print("\n".join([str(report) for report in reports]))
     return files_ok, files_with_errors, total_errors
 
 
-def msgcheck_display_result(args, result):
+def msgcheck_display_result(args: argparse.Namespace, result: tuple[str, list[PoReport]]) -> int:
     """Display result and return the number of files with errors."""
     # display errors
-    files_ok, files_with_errors, total_errors = msgcheck_display_errors(
-        args, result
-    )
+    files_ok, files_with_errors, total_errors = msgcheck_display_errors(args, result)
 
     # exit now if we extracted translations or if we displayed only
     # misspelled words
@@ -239,7 +233,7 @@ def msgcheck_display_result(args, result):
         if errors == 0:
             print(f"{filename}: OK")
         else:
-            result = "almost good!" if errors <= 10 else "uh oh... try again!"
+            result = "almost good!" if errors <= 10 else "uh oh... try again!"  # noqa: PLR2004
             print(f"{filename}: {errors} errors ({result})")
 
     # display total (if many files processed)
@@ -248,21 +242,14 @@ def msgcheck_display_result(args, result):
         if files_with_errors == 0:
             print(f"TOTAL: {files_ok} files OK")
         else:
-            print(
-                f"TOTAL: {files_ok} files OK, {files_with_errors} files "
-                f"with {total_errors} errors"
-            )
+            print(f"TOTAL: {files_ok} files OK, {files_with_errors} files with {total_errors} errors")
 
     return files_with_errors
 
 
-def main():  # pylint: disable=too-many-branches
-    """Main function."""
+def check() -> None:
+    """Check gettext files."""
     args = msgcheck_args(msgcheck_parser())
     result = msgcheck_check_files(args)
     files_with_errors = msgcheck_display_result(args, result)
     sys.exit(0 if args.ignore_errors else min(files_with_errors, 255))
-
-
-if __name__ == "__main__":
-    main()
