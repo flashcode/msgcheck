@@ -73,6 +73,18 @@ The environment variable `MSGCHECK_OPTIONS` can be set with some default options
 The script returns exit code **0** if all files checked are OK (0 errors or option
 `--extract` given) or it returns **N**: number of files with errors (1 ≤ N ≤ 255).
 
+### pre-commit
+
+To use msgcheck with [pre-commit](https://pre-commit.com/), add the following to your `.pre-commit-config.yaml`:
+
+```yaml
+- repo: https://github.com/flashcode/msgcheck
+  rev: v4.1.0  # Use the latest tag or a specific commit hash
+  hooks:
+    - id: msgcheck
+      args: []  # add optional arguments like '--fuzzy', see above
+```
+
 ## Example
 
 ```

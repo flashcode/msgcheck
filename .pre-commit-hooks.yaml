@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2025 Sébastien Helleu <flashcode@flashtux.org>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- id: msgcheck
+  name: msgcheck
+  description: 'Perform various checks on gettext files'
+  entry: msgcheck
+  language: python
+  types:
+    - pofile
