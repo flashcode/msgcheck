@@ -23,10 +23,13 @@ all: check
 
 check: lint test
 
-lint: ruff
+lint: ruff ty
 
 ruff:
 	uvx ruff check
+
+ty:
+	uvx ty check
 
 test:
 	uv run pytest -vv --cov=msgcheck --cov-report=term-missing

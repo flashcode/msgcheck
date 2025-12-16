@@ -134,7 +134,7 @@ class PoMessage:
         self.filename = filename
         self.line = line
         # unescape strings
-        msg = {k: escape_decode(v)[0].decode(charset) for k, v in msg.items()}
+        msg = {k: escape_decode(v)[0].decode(charset) for k, v in msg.items()}  # ty: ignore[unresolved-attribute]
         # build messages as a list of tuples: (string, translation)
         self.messages = []
         if "msgid_plural" in msg:
@@ -544,7 +544,7 @@ class PoCheck:
                         tmp_file.flush()
                         _dict = DictWithPWL(lang, tmp_file.name)
                 else:
-                    _dict = DictWithPWL(lang, None)
+                    _dict = DictWithPWL(lang, None)  # ty: ignore[invalid-argument-type]
                 checker.append(SpellChecker(_dict))
             except DictNotFoundError:
                 reports.append(
