@@ -25,7 +25,7 @@ The script requires:
 
 - Python ≥ 3.9
 - gettext (for the command `msgfmt`, used to compile PO files)
-- the python module `pyenchant` if spelling is checked (with option `-s`).
+- the python module `pyenchant` for spell checking (option `-s`).
 
 ## Install
 
@@ -35,10 +35,10 @@ Install a released version from the Python package index with pip:
 $ pip install msgcheck
 ```
 
-Or you can install via source distribution:
+Or you can run via source distribution:
 
 ```
-$ python setup.py install
+$ uv run msgcheck
 ```
 
 ## Usage
