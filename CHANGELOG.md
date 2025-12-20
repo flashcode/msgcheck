@@ -8,15 +8,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 ## Version 4.2.0 (under dev)
 
+### Changed
+
+- **Breaking**: improve typing annotations, Python 3.9 is now required
+- Use uv for packaging
+- Use ruff and ty linters
+
 ### Added
 
 - Add official pre-commit hook
-
-### Changed
-
-- Use uv for packaging
-- Use ruff and ty linters
-- Improve typing annotations, Python 3.9 is now required
 
 ## Version 4.1.0 (2024-10-23)
 
