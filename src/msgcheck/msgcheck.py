@@ -43,10 +43,14 @@ import sys
 from msgcheck.po import PoCheck, PoFileReport
 
 
+class CustomHelpFormatter(argparse.RawDescriptionHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
+    """Help formatter with raw description/epilog and default values."""
+
+
 def msgcheck_parser() -> argparse.ArgumentParser:
     """Return a command line parser for msgcheck."""
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=CustomHelpFormatter,
         fromfile_prefix_chars="@",
         description="Gettext file checker.",
         epilog="""
