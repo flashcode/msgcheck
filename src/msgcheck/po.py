@@ -25,6 +25,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import tempfile
@@ -614,42 +615,40 @@ class PoCheck:
 
         return reports
 
-    def check_files(self, files: list[str]) -> list[tuple[str, list[PoReport]]]:
-        """Check translations in PO files.
+    def check_file(self, filename: str) -> list[PoReport]:
+        """Check compilation and translations in a PO file.
 
         Return a list of tuples: (filename, [PoReport, PoReport, ...]).
         """
-        result = []
+        po_file = PoFile(filename)
+        # read the file
+        try:
+            po_file.read()
+        except OSError as exc:
+            return [PoReport(str(exc), "read", po_file.filename)]
+        # compile the file (except if disabled)
+        compile_rc = 0
+        if self.checks["compile"]:
+            compile_output, compile_rc = po_file.compile()
+        if compile_rc != 0:
+            # compilation failed
+            return [PoReport(compile_output, "compile", po_file.filename)]
+        # compilation OK
+        return self.check_pofile(po_file)
 
-        for filename in files:
-            po_file = PoFile(filename)
-            # read the file
-            try:
-                po_file.read()
-            except OSError as exc:
-                result.append(
-                    (
-                        po_file.filename,
-                        [PoReport(str(exc), "read", po_file.filename)],
-                    ),
-                )
-                continue
-            # compile the file (except if disabled)
-            compile_rc = 0
-            if self.checks["compile"]:
-                compile_output, compile_rc = po_file.compile()
-            if compile_rc == 0:
-                # compilation OK
-                result.append((po_file.filename, self.check_pofile(po_file)))
+    def check_files(self, files: list[str]) -> list[tuple[str, list[PoReport]]]:
+        """Check compilation and translations in PO files.
+
+        Return a list of tuples: (filename, [PoReport, PoReport, ...]).
+        """
+        result: list[tuple[str, list[PoReport]]] = []
+        for path in files:
+            if Path(path).is_dir():
+                for root, _, filenames in os.walk(path):
+                    for filename in filenames:
+                        if filename.endswith(".po"):
+                            path_po = Path(root) / filename
+                            result.append((str(path_po), self.check_file(str(path_po))))
             else:
-                # compilation failed
-                result.append(
-                    (
-                        po_file.filename,
-                        [
-                            PoReport(compile_output, "compile", po_file.filename),
-                        ],
-                    ),
-                )
-
+                result.append((path, self.check_file(path)))
         return result

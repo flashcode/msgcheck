@@ -11,6 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 ### Changed
 
 - **Breaking**: improve typing annotations, Python 3.9 is now required
+- Scan entire directories with path given on command line
 - Use uv for packaging
 - Use ruff and ty linters
 

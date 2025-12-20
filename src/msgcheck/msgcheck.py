@@ -152,9 +152,9 @@ The script returns:
         version=version,
     )
     parser.add_argument(
-        "file",
+        "files",
         nargs="+",
-        help="gettext file(s) to check (*.po files)",
+        help="files or directories with gettext files (*.po)",
     )
     return parser
 
@@ -187,7 +187,7 @@ def msgcheck_check_files(args: argparse.Namespace) -> list[tuple[str, list[PoRep
     # check all files
     try:
         po_check.set_spelling_options(args.spelling, args.dicts, args.pwl)
-        result = po_check.check_files(args.file)
+        result = po_check.check_files(args.files)
     except (ImportError, OSError) as exc:
         print("FATAL:", exc, sep=" ")
         sys.exit(1)
@@ -240,12 +240,8 @@ def msgcheck_display_result(args: argparse.Namespace, result: list[tuple[str, li
             print(f"{filename}: {errors} errors ({str_result})")
 
     # display total (if many files processed)
-    if len(args.file) > 1:
-        print("---")
-        if files_with_errors == 0:
-            print(f"TOTAL: {files_ok} files OK")
-        else:
-            print(f"TOTAL: {files_ok} files OK, {files_with_errors} files with {total_errors} errors")
+    str_errors = f", {files_with_errors} files with {total_errors} errors" if files_with_errors > 0 else ""
+    print(f"TOTAL: {files_ok} files OK{str_errors}")
 
     return files_with_errors
 

@@ -46,7 +46,7 @@ $ uv run msgcheck
 Syntax:
 
 ```
-$ msgcheck [options] file.po [file.po...]
+$ msgcheck [options] files [files...]
 ```
 
 Options:
