@@ -17,6 +17,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 ### Added
 
+- Add option `-o` (or `--output-format`) to customize output format
 - Add official pre-commit hook
 
 ## Version 4.1.0 (2024-10-23)

@@ -62,10 +62,10 @@ def test_extract() -> None:
     po_check.set_check("extract", True)
     result = po_check.check_files([local_path("fr.po")])
     assert len(result) == 1
-    assert "fr.po" in result[0][0]
-    assert len(result[0][1]) == 3
+    assert "fr.po" in result[0].filename
+    assert len(result[0]) == 3
 
-    report = result[0][1][0]
+    report = result[0][0]
     assert report.message == "Ceci est un test.\n"
     assert report.idmsg == "extract"
     assert report.filename == "-"
@@ -73,9 +73,9 @@ def test_extract() -> None:
     assert report.mid == ""
     assert report.mstr == ""
     assert report.fuzzy is False
-    assert str(report) == "Ceci est un test.\n\n---"
+    assert report.to_string() == "Ceci est un test.\n\n---"
 
-    report = result[0][1][1]
+    report = result[0][1]
     assert report.message == "Test sur deux lignes.\nLigne 2."
     assert report.idmsg == "extract"
     assert report.filename == "-"
@@ -83,9 +83,9 @@ def test_extract() -> None:
     assert report.mid == ""
     assert report.mstr == ""
     assert report.fuzzy is False
-    assert str(report) == "Test sur deux lignes.\nLigne 2.\n---"
+    assert report.to_string() == "Test sur deux lignes.\nLigne 2.\n---"
 
-    report = result[0][1][2]
+    report = result[0][2]
     assert report.message == " erreur : %s"  # noqa: RUF001
     assert report.idmsg == "extract"
     assert report.filename == "-"
@@ -93,7 +93,7 @@ def test_extract() -> None:
     assert report.mid == ""
     assert report.mstr == ""
     assert report.fuzzy is False
-    assert str(report) == " erreur : %s\n---"  # noqa: RUF001
+    assert report.to_string() == " erreur : %s\n---"  # noqa: RUF001
 
 
 def test_checks() -> None:
@@ -105,13 +105,13 @@ def test_checks() -> None:
     assert len(result) == 2
 
     # first file has no errors
-    assert not result[0][1]
+    assert not result[0]
 
     # second file has 10 errors
-    assert len(result[1][1]) == 9
+    assert len(result[1]) == 9
 
     # check first error
-    report = result[1][1][0]
+    report = result[1][0]
     assert report.message == "number of lines: 2 in string, 1 in translation"
     assert report.idmsg == "lines"
     assert "fr_errors.po" in report.filename
@@ -119,10 +119,10 @@ def test_checks() -> None:
     assert report.mid == "Test 1 on two lines.\nLine 2."
     assert report.mstr == "Test 1 sur deux lignes."
     assert report.fuzzy is False
-    assert "fr_errors.po:44: [lines] number of lines: 2 in string, 1 in translation" in str(report)
+    assert "fr_errors.po:44: [lines] number of lines: 2 in string, 1 in translation" in report.to_string()
 
     # check last error
-    report = result[1][1][8]
+    report = result[1][8]
     expected = "different whitespace at end of a line: 1 in string, 0 in translation"
     assert report.message == expected
     assert report.idmsg == "whitespace_eol"
@@ -133,8 +133,8 @@ def test_checks() -> None:
     assert report.fuzzy is False
 
     # check number of errors by type
-    errors = {}
-    for report in result[1][1]:
+    errors: dict[str, int] = {}
+    for report in result[1]:
         errors[report.idmsg] = errors.get(report.idmsg, 0) + 1
     assert errors["lines"] == 2
     assert errors["punct"] == 1
@@ -152,7 +152,7 @@ def test_checks_fuzzy() -> None:
     assert len(result) == 1
 
     # the file has 11 errors (with the fuzzy string)
-    assert len(result[0][1]) == 10
+    assert len(result[0]) == 10
 
 
 def test_checks_noqa() -> None:
@@ -165,7 +165,7 @@ def test_checks_noqa() -> None:
     assert len(result) == 1
 
     # the file has 10 errors (including `noqa`-commented lines)
-    assert len(result[0][1]) == 10
+    assert len(result[0]) == 10
 
 
 def test_replace_fmt_c() -> None:
@@ -238,7 +238,7 @@ def test_spelling_id() -> None:
     assert len(result) == 1
 
     # the file has 2 spelling errors: "Thsi" and "errro"
-    report = result[0][1]
+    report = result[0]
     assert len(report) == 3
     for i, word in enumerate(("Thsi", "testtwo", "errro")):
         assert report[i].idmsg == "spelling-id"
@@ -262,7 +262,7 @@ def test_spelling_id_multilpe_pwl() -> None:
     assert len(result) == 1
 
     # the file has 2 spelling errors: "Thsi" and "errro"
-    report = result[0][1]
+    report = result[0]
     assert len(report) == 2
     for i, word in enumerate(("Thsi", "errro")):
         assert report[i].idmsg == "spelling-id"
@@ -283,7 +283,7 @@ def test_spelling_str() -> None:
     assert len(result) == 2
 
     # first file has 3 spelling errors: "CecX", "aabbcc" and "xxyyzz"
-    report = result[0][1]
+    report = result[0]
     assert len(report) == 4
     for i, word in enumerate(("testtwo", "CecX", "aabbcc", "xxyyzz")):
         assert report[i].idmsg == "spelling-str"
@@ -293,7 +293,7 @@ def test_spelling_str() -> None:
         assert report[i].get_misspelled_words() == [word]
 
     # second file has 1 error: dict/language "xyz" not found
-    report = result[1][1]
+    report = result[1]
     assert len(report) == 1
     assert report[0].idmsg == "dict"
 
@@ -312,7 +312,7 @@ def test_spelling_str_multiple_pwl() -> None:
     assert len(result) == 2
 
     # first file has 3 spelling errors: "CecX", "aabbcc" and "xxyyzz"
-    report = result[0][1]
+    report = result[0]
     assert len(report) == 3
     for i, word in enumerate(("CecX", "aabbcc", "xxyyzz")):
         assert report[i].idmsg == "spelling-str"
@@ -322,7 +322,7 @@ def test_spelling_str_multiple_pwl() -> None:
         assert report[i].get_misspelled_words() == [word]
 
     # second file has 1 error: dict/language "xyz" not found
-    report = result[1][1]
+    report = result[1]
     assert len(report) == 1
     assert report[0].idmsg == "dict"
 
@@ -416,4 +416,4 @@ def test_invalid_utf8() -> None:
     assert len(result) == 1
 
     # the file has no errors
-    assert len(result[0][1]) == 0
+    assert len(result[0]) == 0

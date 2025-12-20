@@ -72,18 +72,24 @@ class PoReport:
         self.mstr = mstr
         self.fuzzy = fuzzy
 
-    def __repr__(self) -> str:
+    def to_string(self, fmt: str = "full") -> str:  # noqa: PLR0911
         """Return PO report as string."""
         if self.idmsg == "extract":
             if isinstance(self.message, list):
                 return ", ".join(self.message) + "\n---"
             return self.message + "\n---"
         if self.idmsg == "compile":
+            if fmt == "oneline":
+                if isinstance(self.message, list):
+                    return self.message[0]
+                return self.message.split("\n")[0]
             return f"{'=' * 70}\n{self.message}"
         is_list = isinstance(self.message, list)
         count = f"({len(self.message)})" if is_list else ""
         str_fuzzy = "(fuzzy) " if self.fuzzy else ""
         str_msg = ", ".join(self.message) if is_list else self.message
+        if fmt == "oneline":
+            return f"{self.filename}:{self.line}: [{self.idmsg}{count}] {str_fuzzy}{str_msg}"
         msg = f"{'=' * 70}\n{self.filename}:{self.line}: [{self.idmsg}{count}] {str_fuzzy}{str_msg}"
         if self.mid:
             msg += "\n---\n" + self.mid
@@ -94,6 +100,14 @@ class PoReport:
     def get_misspelled_words(self) -> list[str]:
         """Return list of misspelled words."""
         return self.message if isinstance(self.message, list) else []
+
+
+class PoFileReport(list):
+    """A file report."""
+
+    def __init__(self, filename: str = "-") -> None:
+        """Initialize PO file report."""
+        self.filename = filename
 
 
 class PoMessage:
@@ -615,40 +629,42 @@ class PoCheck:
 
         return reports
 
-    def check_file(self, filename: str) -> list[PoReport]:
-        """Check compilation and translations in a PO file.
-
-        Return a list of tuples: (filename, [PoReport, PoReport, ...]).
-        """
+    def check_file(self, filename: str) -> PoFileReport :
+        """Check compilation and translations in a PO file."""
         po_file = PoFile(filename)
+        report = PoFileReport(po_file.filename)
         # read the file
         try:
             po_file.read()
         except OSError as exc:
-            return [PoReport(str(exc), "read", po_file.filename)]
+            report.append(PoReport(str(exc), "read", po_file.filename))
+            return report
         # compile the file (except if disabled)
         compile_rc = 0
         if self.checks["compile"]:
             compile_output, compile_rc = po_file.compile()
         if compile_rc != 0:
             # compilation failed
-            return [PoReport(compile_output, "compile", po_file.filename)]
+            report.append(PoReport(compile_output, "compile", po_file.filename))
+            return report
         # compilation OK
-        return self.check_pofile(po_file)
+        report.extend(self.check_pofile(po_file))
+        return report
 
-    def check_files(self, files: list[str]) -> list[tuple[str, list[PoReport]]]:
+    def check_files(self, files: list[str]) -> list[PoFileReport]:
         """Check compilation and translations in PO files.
 
         Return a list of tuples: (filename, [PoReport, PoReport, ...]).
         """
-        result: list[tuple[str, list[PoReport]]] = []
+        result: list[PoFileReport] = []
         for path in files:
             if Path(path).is_dir():
                 for root, _, filenames in os.walk(path):
-                    for filename in filenames:
-                        if filename.endswith(".po"):
-                            path_po = Path(root) / filename
-                            result.append((str(path_po), self.check_file(str(path_po))))
+                    result.extend([
+                        self.check_file(str(Path(root) / filename))
+                        for filename in filenames
+                        if filename.endswith(".po")
+                    ])
             else:
-                result.append((path, self.check_file(path)))
+                result.append(self.check_file(path))
         return result

@@ -65,6 +65,7 @@ Options:
 - `-W`, `--no-whitespace-eol`: do not check whitespace at end of lines inside strings
 - `-e`, `--extract`: display all translations and exit (all checks except compilation are disabled in this mode)
 - `-i`, `--ignore-errors`: display but ignore errors (always return 0)
+- `-o`, `--output-format`: output format
 - `-q`, `--quiet`: quiet mode: only display number of errors
 - `-v`, `--version`: display version and exit
 

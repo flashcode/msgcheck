@@ -40,7 +40,7 @@ import os
 import shlex
 import sys
 
-from msgcheck.po import PoCheck, PoReport
+from msgcheck.po import PoCheck, PoFileReport
 
 
 def msgcheck_parser() -> argparse.ArgumentParser:
@@ -139,6 +139,13 @@ The script returns:
         help="display but ignore errors (always return 0)",
     )
     parser.add_argument(
+        "-o",
+        "--output-format",
+        choices=["full", "oneline"],
+        default="full",
+        help="output format: full = complete output, oneline = one line output",
+    )
+    parser.add_argument(
         "-q",
         "--quiet",
         action="store_true",
@@ -167,7 +174,7 @@ def msgcheck_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
     return parser.parse_args(shlex.split(os.getenv("MSGCHECK_OPTIONS") or "") + sys.argv[1:])
 
 
-def msgcheck_check_files(args: argparse.Namespace) -> list[tuple[str, list[PoReport]]]:
+def msgcheck_check_files(args: argparse.Namespace) -> list[PoFileReport]:
     """Check files."""
     # create checker and set boolean options
     po_check = PoCheck()
@@ -195,30 +202,27 @@ def msgcheck_check_files(args: argparse.Namespace) -> list[tuple[str, list[PoRep
     return result
 
 
-def msgcheck_display_errors(
-    args: argparse.Namespace,
-    result: list[tuple[str, list[PoReport]]],
-) -> tuple[int, int, int]:
+def msgcheck_display_errors(args: argparse.Namespace, result: list[PoFileReport]) -> tuple[int, int, int]:
     """Display error messages."""
     files_ok, files_with_errors, total_errors = 0, 0, 0
-    for _, reports in result:
-        if not reports:
+    for report in result:
+        if not report:
             files_ok += 1
             continue
         files_with_errors += 1
-        total_errors += len(reports)
+        total_errors += len(report)
         if not args.quiet:
             if args.only_misspelled:
                 words = []
-                for report in reports:
-                    words.extend(report.get_misspelled_words())
+                for error in report:
+                    words.extend(error.get_misspelled_words())
                 print("\n".join(sorted(set(words), key=lambda s: s.lower())))
             else:
-                print("\n".join([str(report) for report in reports]))
+                print("\n".join([error.to_string(fmt=args.output_format) for error in report]))
     return files_ok, files_with_errors, total_errors
 
 
-def msgcheck_display_result(args: argparse.Namespace, result: list[tuple[str, list[PoReport]]]) -> int:
+def msgcheck_display_result(args: argparse.Namespace, result: list[PoFileReport]) -> int:
     """Display result and return the number of files with errors."""
     # display errors
     files_ok, files_with_errors, total_errors = msgcheck_display_errors(args, result)
@@ -229,19 +233,21 @@ def msgcheck_display_result(args: argparse.Namespace, result: list[tuple[str, li
         sys.exit(0)
 
     # display files with number of errors
-    if total_errors > 0 and not args.quiet:
-        print("=" * 70)
-    for filename, reports in result:
-        errors = len(reports)
-        if errors == 0:
-            print(f"{filename}: OK")
-        else:
-            str_result = "almost good!" if errors <= 10 else "uh oh... try again!"  # noqa: PLR2004
-            print(f"{filename}: {errors} errors ({str_result})")
+    if args.output_format == "full":
+        if total_errors > 0 and not args.quiet:
+            print("=" * 70)
+        for report in result:
+            errors = len(report)
+            if errors == 0:
+                print(f"{report.filename}: OK")
+            else:
+                str_result = "almost good!" if errors <= 10 else "uh oh... try again!"  # noqa: PLR2004
+                print(f"{report.filename}: {errors} errors ({str_result})")
 
     # display total (if many files processed)
-    str_errors = f", {files_with_errors} files with {total_errors} errors" if files_with_errors > 0 else ""
-    print(f"TOTAL: {files_ok} files OK{str_errors}")
+    if args.output_format == "full":
+        str_errors = f", {files_with_errors} files with {total_errors} errors" if files_with_errors > 0 else ""
+        print(f"TOTAL: {files_ok} files OK{str_errors}")
 
     return files_with_errors
 
