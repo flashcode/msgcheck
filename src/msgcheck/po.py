@@ -479,9 +479,9 @@ class PoFile:
             output = subprocess.check_output(  # noqa: S603
                 ["msgfmt", "-c", "-o", "/dev/null", self.filename],  # noqa: S607
                 stderr=subprocess.STDOUT,
-            ).decode("utf-8")
+            ).decode("utf-8", errors="replace")
         except subprocess.CalledProcessError as exc:
-            return (exc.output, exc.returncode)
+            return (exc.output.decode("utf-8", errors="replace"), exc.returncode)
         return (output, 0)
 
 
