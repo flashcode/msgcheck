@@ -24,16 +24,18 @@
 import re
 
 STR_FORMATTERS = {
-    "c": (
+    "c": [
         (r"[\%]{2}", "%"),
         (r"\%([ hlL\d\.\-\+\#\*]+)?[cdieEfgGosuxXpn]", r""),
-    ),
-    "python": (
+    ],
+    "python": [
         (r"[\%]{2}", "%"),
         (r"\%([.\d]+)?[bcdeEfFgGnosxX]", r""),
         (r"\%(\([^)]*\))([.\d]+)?[bcdeEfFgGnosxX]", r""),
-    ),
-    "python-brace": ((r"\{([^\:\}]*)?(:[^\}]*)?\}", r""),),
+    ],
+    "python-brace": [
+        (r"\{([^\:\}]*)?(:[^\}]*)?\}", r""),
+    ],
 }
 
 
@@ -47,6 +49,6 @@ def count_lines(string: str) -> int:
 
 def replace_formatters(string: str, fmt: str) -> str:
     r"""Replace formatters (like "%s" or "%03d") with a replacement string."""
-    for pattern, repl in STR_FORMATTERS[fmt]:
+    for pattern, repl in STR_FORMATTERS.get(fmt, []):
         string = re.sub(pattern, repl, string)
     return string
