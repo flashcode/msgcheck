@@ -232,7 +232,8 @@ def msgcheck_display_errors(args: argparse.Namespace, result: list[PoFileReport]
                 words = []
                 for error in report:
                     words.extend(error.get_misspelled_words())
-                print("\n".join(sorted(set(words), key=lambda s: s.lower())))
+                if words:
+                    print("\n".join(sorted(set(words), key=lambda s: s.lower())))
             else:
                 print("\n".join([error.to_string(fmt=args.output_format) for error in report]))
     return files_ok, files_with_errors, total_errors
