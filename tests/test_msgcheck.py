@@ -59,7 +59,7 @@ def test_read() -> None:
 def test_extract() -> None:
     """Test extract on a gettext file."""
     po_check = PoCheck()
-    po_check.set_check("extract", True)
+    po_check.set_check("extract")
     result = po_check.check_files([local_path("fr.po")])
     assert len(result) == 1
     assert "fr.po" in result[0].filename
@@ -145,7 +145,7 @@ def test_checks() -> None:
 def test_checks_fuzzy() -> None:
     """Test checks on a gettext file including fuzzy strings."""
     po_check = PoCheck()
-    po_check.set_check("fuzzy", True)
+    po_check.set_check("fuzzy")
     result = po_check.check_files([local_path("fr_errors.po")])
 
     # be sure we have one file in result
@@ -158,7 +158,7 @@ def test_checks_fuzzy() -> None:
 def test_checks_noqa() -> None:
     """Test checks on a gettext file including `noqa`-commented lines."""
     po_check = PoCheck()
-    po_check.set_check("check_noqa", True)
+    po_check.set_check("check_noqa")
     result = po_check.check_files([local_path("fr_errors.po")])
 
     # be sure we have one file in result
@@ -409,7 +409,7 @@ def test_punct_full_stop_ja_zh(language: str, msgid: str, msgstr: str, error_mes
 def test_invalid_utf8() -> None:
     """Test checks on a file with invalid UTF-8 chars."""
     po_check = PoCheck()
-    po_check.set_check("fuzzy", True)
+    po_check.set_check("fuzzy")
     result = po_check.check_files([local_path("fr_invalid_utf8.po")])
 
     # be sure we have one file in result

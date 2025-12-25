@@ -60,12 +60,16 @@ Options:
 - `-s id|str`, `--spelling id|str`: check spelling (`id` = source messages, `str` = translations)
 - `-d <dicts>`, `--dicts <dicts>`: comma-separated list of extra dictionaries to use (in addition to file language)
 - `-P <file>`, `--pwl <file>`: file(s) with personal list of words used when checking spelling (this option can be given multiple times)
-- `-m`, `--only-misspelled`: display only misspelled words (no error, line number and translation)
+- `-m`, `--only-misspelled`: display only misspelled words (alias of `--output-format=misspelled`)
 - `-w`, `--no-whitespace`: do not check whitespace at beginning/end of strings
 - `-W`, `--no-whitespace-eol`: do not check whitespace at end of lines inside strings
-- `-e`, `--extract`: display all translations and exit (all checks except compilation are disabled in this mode)
+- `-e`, `--extract`: display all translations and exit (alias of `--output-format=extract`)
 - `-i`, `--ignore-errors`: display but ignore errors (always return 0)
-- `-o`, `--output-format`: output format
+- `-o`, `--output-format`: output format:
+  - `full`: complete output
+  - `oneline`: one line output
+  - `extract`: display all translations (all checks except compilation are disabled in this mode)
+  - `misspelled`: display only misspelled words
 - `-q`, `--quiet`: quiet mode: only display number of errors
 - `-v`, `--version`: display version and exit
 

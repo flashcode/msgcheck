@@ -42,6 +42,13 @@ import sys
 
 from msgcheck.po import PoCheck, PoFileReport
 
+HELP_OUTPUT_FORMATS = [
+    "full = complete output",
+    "oneline = one line output",
+    "extract = display all translations (all checks except compilation are disabled in this mode)",
+    "misspelled = display only misspelled words",
+]
+
 
 class CustomHelpFormatter(argparse.RawDescriptionHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
     """Help formatter with raw description/epilog and default values."""
@@ -59,7 +66,7 @@ Argument "@file.txt" can be used to read default options in a file.
 
 The script returns:
   0: all files checked are OK (or one of these options given:
-     --extract, --only-misspelled or --ignore-errors given)
+     --output-format={extract|misspelled} or --ignore-errors given)
   n: number of files with errors (1 ≤ n ≤ 255)
 """,
     )
@@ -116,7 +123,7 @@ The script returns:
         "-m",
         "--only-misspelled",
         action="store_true",
-        help="display only misspelled words (no error, line number and translation)",
+        help="display only misspelled words (alias of --output-format=misspelled)",
     )
     parser.add_argument(
         "-w",
@@ -134,7 +141,7 @@ The script returns:
         "-e",
         "--extract",
         action="store_true",
-        help="display all translations and exit (all checks except compilation are disabled in this mode)",
+        help="display all translations and exit (alias of --output-format=extract)",
     )
     parser.add_argument(
         "-i",
@@ -145,9 +152,9 @@ The script returns:
     parser.add_argument(
         "-o",
         "--output-format",
-        choices=["full", "oneline"],
+        choices=["full", "oneline", "extract", "misspelled"],
         default="full",
-        help="output format: full = complete output, oneline = one line output",
+        help=f"output format: {', '.join(HELP_OUTPUT_FORMATS)}",
     )
     parser.add_argument(
         "-q",
@@ -190,10 +197,15 @@ def msgcheck_check_files(args: argparse.Namespace) -> list[PoFileReport]:
         "no_punct",
         "no_whitespace",
         "no_whitespace_eol",
-        "extract",
     ):
         if args.__dict__[option]:
             po_check.set_check(option.lstrip("no_"), not option.startswith("no_"))
+    if args.extract:
+        args.output_format = "extract"
+    elif args.only_misspelled:
+        args.output_format = "misspelled"
+    if args.output_format == "extract":
+        po_check.set_check("extract")
 
     # check all files
     try:
@@ -216,7 +228,7 @@ def msgcheck_display_errors(args: argparse.Namespace, result: list[PoFileReport]
         files_with_errors += 1
         total_errors += len(report)
         if not args.quiet:
-            if args.only_misspelled:
+            if args.output_format == "misspelled":
                 words = []
                 for error in report:
                     words.extend(error.get_misspelled_words())
@@ -231,9 +243,8 @@ def msgcheck_display_result(args: argparse.Namespace, result: list[PoFileReport]
     # display errors
     files_ok, files_with_errors, total_errors = msgcheck_display_errors(args, result)
 
-    # exit now if we extracted translations or if we displayed only
-    # misspelled words
-    if args.extract or args.only_misspelled:
+    # exit now if we extracted translations or if we displayed only misspelled words
+    if args.output_format in ("extract", "misspelled"):
         sys.exit(0)
 
     # display files with number of errors

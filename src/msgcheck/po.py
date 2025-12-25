@@ -526,7 +526,7 @@ class PoCheck:
         """Return PO checker as string."""
         return f"checks: {self.checks}, dicts: {self.dicts}, extra_checkers: {self.extra_checkers}"
 
-    def set_check(self, check: str, state: bool) -> None:
+    def set_check(self, check: str, state: bool = True) -> None:
         """Enable/disable a specific check."""
         if check in self.checks:
             self.checks[check] = state
