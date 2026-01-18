@@ -151,8 +151,15 @@ def test_checks_fuzzy() -> None:
     # be sure we have one file in result
     assert len(result) == 1
 
-    # the file has 11 errors (with the fuzzy string)
-    assert len(result[0]) == 10
+    # the file has 11 errors (10 regular + 1 fuzzy string error)
+    assert len(result[0]) == 11
+
+    # verify that fuzzy string is reported as an error
+    fuzzy_errors = [report for report in result[0] if report.idmsg == "fuzzy"]
+    assert len(fuzzy_errors) == 1
+    assert fuzzy_errors[0].message == "fuzzy string found"
+    assert fuzzy_errors[0].fuzzy is True
+    assert fuzzy_errors[0].line == 58  # Line number of msgid (fuzzy comment is at line 57)
 
 
 def test_checks_noqa() -> None:
