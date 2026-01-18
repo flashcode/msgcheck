@@ -352,6 +352,31 @@ class PoMessage:
                 )
         return errors
 
+    def check_fuzzy_string(self) -> list[PoReport]:
+        """Check if message is marked as fuzzy.
+
+        Return a list with errors detected.
+        """
+        if not self.fuzzy:
+            return []
+        errors: list[PoReport] = []
+        # Report fuzzy strings (skip header entries with empty msgid)
+        for mid, mstr in self.messages:
+            if mid:  # Skip header entries (empty msgid)
+                errors.append(
+                    PoReport(
+                        "fuzzy string found",
+                        "fuzzy",
+                        self.filename,
+                        self.line,
+                        mid,
+                        mstr,
+                        fuzzy=True,
+                    ),
+                )
+                break
+        return errors
+
 
 class Checker:
     """Messages checker."""
@@ -596,6 +621,8 @@ class PoCheck:
                 if mid and mstr:
                     reports.append(PoReport(mstr, "extract"))
         else:
+            if self.checks["fuzzy"]:
+                reports += msg.check_fuzzy_string()
             if self.checks["lines"]:
                 reports += msg.check_lines()
             if self.checks["punct"]:
@@ -629,7 +656,7 @@ class PoCheck:
 
         return reports
 
-    def check_file(self, filename: str) -> PoFileReport :
+    def check_file(self, filename: str) -> PoFileReport:
         """Check compilation and translations in a PO file."""
         po_file = PoFile(filename)
         report = PoFileReport(po_file.filename)
@@ -660,11 +687,13 @@ class PoCheck:
         for path in files:
             if Path(path).is_dir():
                 for root, _, filenames in os.walk(path):
-                    result.extend([
-                        self.check_file(str(Path(root) / filename))
-                        for filename in filenames
-                        if filename.endswith(".po")
-                    ])
+                    result.extend(
+                        [
+                            self.check_file(str(Path(root) / filename))
+                            for filename in filenames
+                            if filename.endswith(".po")
+                        ],
+                    )
             else:
                 result.append(self.check_file(path))
         return result
