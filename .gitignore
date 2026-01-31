@@ -10,3 +10,11 @@ build/
 dist/
 msgcheck.egg-info/
 nose-*.egg/
+.ruff_cache/
+.pytest_cache/
+.ty_cache/
+.coverage/
+.tox
+.venv/
+venv
+__pycache__/

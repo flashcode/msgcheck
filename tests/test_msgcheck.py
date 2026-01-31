@@ -151,8 +151,48 @@ def test_checks_fuzzy() -> None:
     # be sure we have one file in result
     assert len(result) == 1
 
-    # the file has 11 errors (with the fuzzy string)
+    # the file has 10 errors (with the fuzzy string)
     assert len(result[0]) == 10
+
+
+def test_error_on_fuzzy() -> None:
+    """Test error_on_fuzzy option that raises an error when fuzzy strings are found."""
+    po_check = PoCheck()
+    # disable all tests and enable only "error_on_fuzzy"
+    po_check.checks = dict.fromkeys(po_check.checks, False)
+    po_check.set_check("error_on_fuzzy")
+    result = po_check.check_files([local_path("fr_errors.po")])
+
+    # be sure we have one file in result
+    assert len(result) == 1
+
+    # the file has 1 fuzzy string
+    assert len(result[0]) == 1
+
+    # check the error report
+    report = result[0][0]
+    assert report.idmsg == "fuzzy"
+    assert report.message == "fuzzy string"
+    assert report.fuzzy is True
+    assert "fr_errors.po" in report.filename
+    assert report.line == 58  # Line where the fuzzy string starts
+    assert report.mid == "Tested 3"
+    assert report.mstr == "Testé 3."
+
+
+def test_error_on_fuzzy_no_fuzzy_strings() -> None:
+    """Test error_on_fuzzy option when there are no fuzzy strings."""
+    po_check = PoCheck()
+    # disable all tests and enable only "error_on_fuzzy"
+    po_check.checks = dict.fromkeys(po_check.checks, False)
+    po_check.set_check("error_on_fuzzy")
+    result = po_check.check_files([local_path("fr.po")])
+
+    # be sure we have one file in result
+    assert len(result) == 1
+
+    # the file has 10 errors (no fuzzy strings)
+    assert len(result[0]) == 0
 
 
 def test_checks_noqa() -> None:
