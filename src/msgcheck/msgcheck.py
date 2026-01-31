@@ -83,6 +83,12 @@ The script returns:
         help="check fuzzy strings",
     )
     parser.add_argument(
+        "-F",
+        "--error-on-fuzzy",
+        action="store_true",
+        help="raise an error if fuzzy strings are found",
+    )
+    parser.add_argument(
         "-n",
         "--check-noqa",
         action="store_true",
@@ -197,6 +203,7 @@ def msgcheck_check_files(args: argparse.Namespace) -> list[PoFileReport]:
         "no_punct",
         "no_whitespace",
         "no_whitespace_eol",
+        "error_on_fuzzy",
     ):
         if args.__dict__[option]:
             po_check.set_check(option.lstrip("no_"), not option.startswith("no_"))

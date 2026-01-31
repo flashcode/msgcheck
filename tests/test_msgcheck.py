@@ -155,6 +155,42 @@ def test_checks_fuzzy() -> None:
     assert len(result[0]) == 10
 
 
+def test_error_on_fuzzy() -> None:
+    """Test error_on_fuzzy option that raises an error when fuzzy strings are found."""
+    po_check = PoCheck()
+    po_check.set_check("error_on_fuzzy")
+    result = po_check.check_files([local_path("fr_errors.po")])
+
+    # be sure we have one file in result
+    assert len(result) == 1
+
+    # the file should have an error for the fuzzy string
+    assert len(result[0]) == 1
+
+    # check the error report
+    report = result[0][0]
+    assert report.idmsg == "fuzzy"
+    assert report.message == "fuzzy string found"
+    assert report.fuzzy is True
+    assert "fr_errors.po" in report.filename
+    assert report.line == 58  # Line where the fuzzy string starts
+    assert report.mid == "Tested 3"
+    assert report.mstr == "Testé 3."
+
+
+def test_error_on_fuzzy_no_fuzzy_strings() -> None:
+    """Test error_on_fuzzy option when there are no fuzzy strings."""
+    po_check = PoCheck()
+    po_check.set_check("error_on_fuzzy")
+    result = po_check.check_files([local_path("fr.po")])
+
+    # be sure we have one file in result
+    assert len(result) == 1
+
+    # the file should have no errors
+    assert len(result[0]) == 0
+
+
 def test_checks_noqa() -> None:
     """Test checks on a gettext file including `noqa`-commented lines."""
     po_check = PoCheck()

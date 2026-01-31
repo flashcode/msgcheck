@@ -515,6 +515,7 @@ class PoCheck:
             "whitespace": True,
             "whitespace_eol": True,
             "extract": False,
+            "error_on_fuzzy": False,
         }
         # spelling options
         self.spelling: str | None = None
@@ -613,6 +614,26 @@ class PoCheck:
         Return a list of PoReport objects.
         """
         reports: list[PoReport] = []
+
+        # check for fuzzy strings if error_on_fuzzy is enabled
+        if self.checks["error_on_fuzzy"]:
+            fuzzy_msgs = [msg for msg in po_file.msgs if msg.fuzzy]
+            if fuzzy_msgs:
+                for msg in fuzzy_msgs:
+                    # Get the first message for display
+                    mid = msg.messages[0][0] if msg.messages else ""
+                    mstr = msg.messages[0][1] if msg.messages else ""
+                    reports.append(
+                        PoReport(
+                            "fuzzy string found",
+                            "fuzzy",
+                            po_file.filename,
+                            msg.line,
+                            mid,
+                            mstr,
+                            fuzzy=True,
+                        ),
+                    )
 
         # build list of checkers (if spelling is enabled)
         checker = self._get_language_checker(po_file, reports)
