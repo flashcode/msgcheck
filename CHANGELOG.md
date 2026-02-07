@@ -18,6 +18,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 ### Added
 
+- Add option `-F` (or `--error-on-fuzzy`) to report fuzzy strings
 - Add option `-o` (or `--output-format`) to customize output format, options `-e` and `-m` are now aliases on this option
 - Add official pre-commit hook
 
