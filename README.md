@@ -23,7 +23,7 @@ Msgcheck performs various checks on gettext files (with extension `.po`):
 
 The script requires:
 
-- Python ≥ 3.9
+- Python ≥ 3.10
 - gettext (for the command `msgfmt`, used to compile PO files)
 - the python module `pyenchant` for spell checking (option `-s`).
 
