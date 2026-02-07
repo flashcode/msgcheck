@@ -27,6 +27,12 @@ The script requires:
 - gettext (for the command `msgfmt`, used to compile PO files)
 - the python module `pyenchant` for spell checking (option `-s`).
 
+> [!NOTE]
+> **February 7, 2026**: Msgcheck is being rewritten in Rust 🦀!\
+> Check the new project: [https://github.com/poexam/poexam](https://github.com/poexam/poexam)\
+> Poexam is a blazingly fast PO file linter with a comprehensive diagnostic report, and many new checks.\
+> It is under active development and your feedback is welcome!
+
 ## Install
 
 Install a released version from the Python package index with pip:
