@@ -18,7 +18,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 ### Added
 
-- Add option `-F` (or `--error-on-fuzzy`) to report fuzzy strings
+- Add option `-F` (or `--error-on-fuzzy`) to report fuzzy strings ([#16](https://github.com/flashcode/msgcheck/issues/16), [#17](https://github.com/flashcode/msgcheck/issues/17))
 - Add option `-o` (or `--output-format`) to customize output format, options `-e` and `-m` are now aliases on this option
 - Add official pre-commit hook
 
