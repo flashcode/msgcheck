@@ -60,6 +60,7 @@ Options:
 - `-h`, `--help`: display help message and exit
 - `-c`, `--no-compile`: do not check compilation of file (with `msgfmt -c`)
 - `-f`, `--fuzzy`: check fuzzy strings
+- `-F`, `--error-on-fuzzy`: raise an error if fuzzy strings are found
 - `-n`, `--check-noqa`: check "noqa"-commented lines (they are skipped by default)
 - `-l`, `--no-lines`: do not check number of lines
 - `-p`, `--no-punct`: do not check punctuation at end of strings
