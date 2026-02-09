@@ -91,7 +91,7 @@ To use msgcheck with [pre-commit](https://pre-commit.com/), add the following to
 
 ```yaml
 - repo: https://github.com/flashcode/msgcheck
-  rev: v4.1.0  # Use the latest tag or a specific commit hash
+  rev: v4.2.0  # Use the latest tag or a specific commit hash
   hooks:
     - id: msgcheck
       args: []  # add optional arguments like '--fuzzy', see above

@@ -6,7 +6,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # Msgcheck ChangeLog
 
-## Version 4.2.0 (under dev)
+## Version 4.2.0 (2026-02-09)
 
 ### Changed
 

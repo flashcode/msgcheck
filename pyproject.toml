@@ -4,7 +4,7 @@
 
 [project]
 name = "msgcheck"
-version = "4.2.0-dev"
+version = "4.2.0"
 description = "Perform various checks on gettext files"
 readme = "README.md"
 authors = [
