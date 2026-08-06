@@ -52,6 +52,7 @@ indent-width = 4
 
 [tool.ruff.lint]
 select = ["ALL"]
+flake8-copyright.notice-rgx = "(?i)# SPDX-FileCopyrightText:\\s\\d{4}(-(\\d{4}|present))*"
 
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/*.py" = [
