@@ -98,11 +98,11 @@ def test_checks() -> None:
     assert report.message == "number of lines: 2 in string, 1 in translation"
     assert report.idmsg == "lines"
     assert "fr_errors.po" in report.filename
-    assert report.line == 44
+    assert report.line == 27
     assert report.mid == "Test 1 on two lines.\nLine 2."
     assert report.mstr == "Test 1 sur deux lignes."
     assert report.fuzzy is False
-    assert "fr_errors.po:44: [lines] number of lines: 2 in string, 1 in translation" in report.to_string()
+    assert "fr_errors.po:27: [lines] number of lines: 2 in string, 1 in translation" in report.to_string()
 
     # check last error
     report = result[1][8]
@@ -110,7 +110,7 @@ def test_checks() -> None:
     assert report.message == expected
     assert report.idmsg == "whitespace_eol"
     assert "fr_errors.po" in report.filename
-    assert report.line == 76
+    assert report.line == 59
     assert report.mid == "Line 1. \nLine 2."
     assert report.mstr == "Ligne 1.\nLigne 2."
     assert report.fuzzy is False
@@ -158,7 +158,7 @@ def test_error_on_fuzzy() -> None:
     assert report.message == "fuzzy string"
     assert report.fuzzy is True
     assert "fr_errors.po" in report.filename
-    assert report.line == 58  # Line where the fuzzy string starts
+    assert report.line == 41  # Line where the fuzzy string starts
     assert report.mid == "Tested 3"
     assert report.mstr == "Testé 3."
 
@@ -260,7 +260,7 @@ def test_spelling_id() -> None:
     # be sure we have 1 file in result
     assert len(result) == 1
 
-    # the file has 2 spelling errors: "Thsi" and "errro"
+    # the file has 3 spelling errors: "Thsi", "testtwo" and "errro"
     report = result[0]
     assert len(report) == 3
     for i, word in enumerate(("Thsi", "testtwo", "errro")):
