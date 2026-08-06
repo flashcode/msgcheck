@@ -36,7 +36,7 @@ def get_concatenated_files(filenames: list[str]) -> str | None:
 class PoReport:
     """A message in report (commonly an error in detected in gettext file)."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         message: str | list[str],
         idmsg: str = "",
@@ -118,7 +118,7 @@ class PoMessage:
               ("%d files found", "%d fichiers trouvés")]
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         filename: str,
         line: int,
