@@ -132,7 +132,7 @@ class PoMessage:
         self.filename = filename
         self.line = line
         # unescape strings
-        msg = {k: escape_decode(v)[0].decode(charset) for k, v in msg.items()}  # ty: ignore[unresolved-attribute]
+        msg = {k: escape_decode(v)[0].decode(charset) for k, v in msg.items()}
         # build messages as a list of tuples: (string, translation)
         self.messages = []
         if "msgid_plural" in msg:
